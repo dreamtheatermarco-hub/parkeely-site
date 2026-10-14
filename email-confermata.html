@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Email confermata · Parkeely</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;family=Nunito:wght@400;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="center">
+  <div class="panel">
+    <img src="logo.png" alt="Parkeely">
+
+    <div id="ok">
+      <div class="badge ok" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1F4A3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17 L19 7"></path></svg>
+      </div>
+      <h1>Email confermata!</h1>
+      <p>Il tuo account Parkeely è attivo. Torna nell'app e accedi con la tua email e password.</p>
+    </div>
+
+    <div id="half" hidden>
+      <div class="badge wait" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5C430A" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7 L12 12 L15 14"></path></svg>
+      </div>
+      <h1>Metà fatto</h1>
+      <p>Abbiamo confermato questo indirizzo. Ora apri anche il link che ti abbiamo mandato sull'altra email: il cambio diventa effettivo quando sono confermati tutti e due.</p>
+    </div>
+
+    <div id="ko" hidden>
+      <div class="badge ko" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#7A2E2E" stroke-width="3" stroke-linecap="round"><path d="M6 6 L18 18 M18 6 L6 18"></path></svg>
+      </div>
+      <h1>Link scaduto o già usato</h1>
+      <p>Se hai già confermato, puoi semplicemente accedere dall'app. Altrimenti apri Parkeely e chiedi una nuova email di conferma.</p>
+    </div>
+  </div>
+</div>
+<script>
+  (function () {
+    var raw = (window.location.hash || '').replace(/^#/, '') + '&' + (window.location.search || '').replace(/^\?/, '');
+    var params = new URLSearchParams(raw);
+    var show = function (id) {
+      ['ok', 'half', 'ko'].forEach(function (k) {
+        document.getElementById(k).hidden = k !== id;
+      });
+    };
+    if (params.get('error') || params.get('error_code')) show('ko');
+    else if (params.get('message')) show('half');
+    else show('ok');
+    // Non lasciamo i codici di accesso nell'indirizzo della pagina
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  })();
+</script>
+</body>
+</html>
