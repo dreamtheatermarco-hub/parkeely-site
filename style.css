@@ -229,3 +229,7 @@ li {
     font-size: 28px;
   }
 }
+
+/* Firma Chooly nel piè di pagina */
+.by { display: inline-flex; align-items: center; gap: 6px; }
+.by img { width: 16px; height: 16px; }
