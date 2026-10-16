@@ -2,24 +2,687 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Parkeely · Il parcheggio social, senza stress</title>
-<meta name="description" content="Chi lascia il parcheggio avvisa, chi arriva lo prenota. Parkeely: lo scambio di posti tra automobilisti.">
+<meta name="description" content="Parkeely: il parcheggio social, senza stress. Siamo quasi pronti a rendere la ricerca di un parcheggio un'esperienza rilassante.">
+<meta name="theme-color" content="#FAF7F0">
+<meta property="og:title" content="Parkeely · Il parcheggio social, senza stress">
+<meta property="og:description" content="Siamo quasi pronti a rendere la ricerca di un parcheggio un'esperienza rilassante.">
+<meta property="og:image" content="https://www.parkeely.it/icon-512.png">
+<meta property="og:url" content="https://www.parkeely.it/">
+<link rel="canonical" href="https://www.parkeely.it/">
 <link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;family=Nunito:wght@400;700&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body { margin: 0; }
+/* Layout: una storia a scorrimento in quattro scene "attaccate" allo schermo (crema → menta → notte → crema),
+   poi un finale fermo con contatti e lista d'attesa. Colori del brand Parkeely, un solo mondo visivo. */
+:root {
+  --crema: #FAF7F0;
+  --menta: #A6DCC3;
+  --menta-medio: #7CC4A3;
+  --menta-tenue: #D8EDE2;
+  --menta-scuro: #1F4A3A;
+  --notte: #15332A;
+  --oro: #F2C14E;
+  --azzurro: #7FB7E3;
+  --testo: #2F3437;
+  --grafite: #5E6366;
+  --bordo: #E6DFD0;
+  --display: 'Quicksand', 'Avenir Next', system-ui, sans-serif;
+  --body: 'Nunito', 'Avenir Next', system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: auto; }
+body { background: var(--crema); color: var(--testo); font-family: var(--body); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; letter-spacing: -0.02em; }
+:focus-visible { outline: 3px solid var(--oro); outline-offset: 3px; }
+
+/* Barra in alto */
+.top {
+  position: fixed; inset: 0 0 auto; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px)); padding-bottom: 14px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px));
+  pointer-events: none; transition: color .5s;
+}
+.top .mark { font-family: var(--display); font-weight: 700; font-size: 20px; opacity: var(--mark, 0); transition: opacity .3s; }
+.top .mark span { color: var(--oro); }
+.top .soon { pointer-events: auto; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 8px 14px; border-radius: 20px; border: 1.5px solid currentColor; background: transparent; cursor: pointer; color: inherit; }
+body[data-scene="night"] .top, body[data-scene="mint2"] .top { color: var(--crema); }
+body[data-scene="mint"] .top { color: var(--menta-scuro); }
+body[data-scene="dusk"] .top { color: var(--crema); }
+
+/* Scene: alte, con un riquadro che resta fermo mentre scorri */
+.scene { position: relative; }
+.stage {
+  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+  display: grid; place-items: center;
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Scena 1: logo e motto ---------- */
+#s1 { height: 150vh; }
+.hero { display: grid; justify-items: center; gap: 10px; text-align: center; transform: translateY(calc(var(--p1, 0) * -12vh)) scale(calc(1 - var(--p1, 0) * .25)); opacity: calc(1 - var(--p1, 0) * 2.6); }
+.logo { width: clamp(150px, 28vw, 230px); height: auto; overflow: visible; }
+.logo .arc { stroke-dasharray: 150; stroke-dashoffset: 150; animation: draw 2.6s .6s cubic-bezier(.45,0,.2,1) forwards; }
+.logo .pin { transform-origin: 60px 100px; transform: translateY(-80px); opacity: 0; animation: drop 2s 1.8s cubic-bezier(.25,1.25,.45,1) forwards; }
+.logo .car { transform: translateX(60px); opacity: 0; animation: slide 1.8s 3.3s cubic-bezier(.2,.8,.25,1) forwards; }
+.word { font-family: var(--display); font-weight: 700; font-size: clamp(52px, 10vw, 112px); line-height: 1; letter-spacing: -0.035em; color: var(--testo); opacity: 0; transform: translateY(14px); animation: rise 1.8s 4.6s cubic-bezier(.2,.7,.3,1) forwards; }
+.word span { display: inline-block; color: var(--oro); transform: scale(0); animation: pop 1s 5.9s cubic-bezier(.3,1.6,.5,1) forwards; }
+.motto { font-size: clamp(18px, 2.4vw, 24px); color: var(--grafite); font-weight: 600; opacity: 0; animation: fade 1.8s 6.3s ease-out forwards; }
+.cue { position: absolute; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--grafite); opacity: clamp(0, calc(.9 - var(--p1, 0) * 6), 1); }
+.cue span { display: grid; justify-items: center; gap: 8px; animation: fade 1.4s 7.6s both; }
+.cue i { width: 22px; height: 34px; border: 2px solid currentColor; border-radius: 12px; position: relative; }
+.cue i::after { content: ""; position: absolute; left: 50%; top: 7px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: currentColor; animation: wheel 1.6s infinite; }
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes drop { 0% { opacity: 0; transform: translateY(-80px); } 30% { opacity: 1; } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes slide { to { opacity: 1; transform: translateX(0); } }
+@keyframes rise { to { opacity: 1; transform: translateY(0); } }
+@keyframes pop { to { transform: scale(1); } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(10px); opacity: 0; } 100% { opacity: 0; } }
+
+/* ---------- Scena 2: i giri a vuoto ---------- */
+#s2 { height: 420vh; }
+/* Lo sfondo vive su un livello fisso dietro la pagina: il contenuto scorre sempre,
+   cambia solo il colore, dal verde tenue al verde notte, mentre arriva la scena successiva */
+.backdrop { position: fixed; inset: 0; z-index: -2; background: color-mix(in srgb, var(--notte) calc(var(--dusk, 0) * 100%), color-mix(in srgb, var(--menta-tenue) calc(var(--zoom, 0) * 100%), var(--crema))); }
+/* Simboli della strada che scorrono piano dietro i contenuti, a velocità diverse */
+.floaters { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; color: color-mix(in srgb, var(--crema) calc(var(--dusk, 0) * 100%), var(--menta-scuro)); }
+.floaters svg { position: absolute; left: 0; top: 0; overflow: visible; will-change: transform; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#s1 .stage { background: transparent; }
+.backdrop .stars2 { position: absolute; inset: 0; opacity: var(--dusk, 0); background-image: radial-gradient(1.2px 1.2px at 12% 18%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 72% 12%, #FAF7F0 50%, transparent 51%), radial-gradient(1.4px 1.4px at 40% 70%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 86% 58%, #FAF7F0 50%, transparent 51%), radial-gradient(1.2px 1.2px at 24% 86%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 58% 36%, #FAF7F0 50%, transparent 51%); }
+#s2 .stage { background: transparent; color: color-mix(in srgb, var(--crema) calc(var(--dusk, 0) * 100%), var(--menta-scuro)); }
+.mark-hi { background: linear-gradient(transparent 58%, rgba(242,193,78,.75) 58%, rgba(242,193,78,.75) 92%, transparent 92%); padding: 0 .08em; }
+.loop-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 4vw, 64px); width: min(1180px, 100%); padding-top: 56px; }
+.lines { display: grid; gap: 14px; }
+.line { font-family: var(--display); font-weight: 700; font-size: clamp(26px, min(3.6vw, 5.4vh), 46px); line-height: 1.08; opacity: .18; transform: translateY(10px); transition: opacity .5s, transform .5s; }
+.line.on { opacity: 1; transform: none; }
+.line.small { font-family: var(--body); font-weight: 700; font-size: clamp(17px, 1.8vw, 20px); color: var(--menta-scuro); }
+.counter { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; display: flex; gap: 10px; align-items: baseline; }
+.counter b { font-size: 44px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; min-width: 1.4ch; }
+.city { width: 100%; max-width: 100%; height: auto; overflow: visible; }
+
+/* ---------- Scena 3: tre parole ---------- */
+#s3 { height: 380vh; }
+#s3 .stage { background: transparent; color: var(--crema); }
+.hints { position: relative; width: min(980px, 100%); min-height: 60vh; display: grid; place-items: center; }
+.hint { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; gap: 22px; text-align: center; opacity: 0; transform: translateY(40px) scale(.96); transition: opacity .7s, transform .7s cubic-bezier(.2,.8,.2,1); }
+.hint.on { opacity: 1; transform: none; }
+.hint.gone { opacity: 0; transform: translateY(-40px) scale(1.02); }
+.hint svg { width: 92px; height: 92px; }
+.hint h2 { font-size: clamp(64px, 13vw, 168px); line-height: .95; letter-spacing: -0.045em; }
+.hint h2 span { color: var(--oro); }
+.hint p { font-size: clamp(18px, 2vw, 22px); color: rgba(250,247,240,.72); max-width: 32ch; }
+.dots { position: absolute; bottom: calc(32px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); display: flex; gap: 10px; }
+.dots i { width: 8px; height: 8px; border-radius: 4px; background: rgba(250,247,240,.25); transition: width .4s, background .4s; }
+.dots i.on { width: 26px; background: var(--oro); }
+.stars { position: absolute; inset: 0; pointer-events: none; }
+
+/* ---------- Scena 4: l'alba / la frase finale ---------- */
+#s4 { height: 240vh; }
+#s4 .stage { background: linear-gradient(to bottom, var(--notte), var(--menta-scuro) 40%, var(--menta-medio) 100%); color: var(--crema); }
+#s4 .sky { position: absolute; inset: 0; background: var(--crema); opacity: var(--dawn, 0); }
+.almost { position: relative; text-align: center; display: grid; gap: 22px; justify-items: center; width: min(900px, 100%); }
+.almost .kicker { font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 14px; color: color-mix(in srgb, var(--oro) calc(100% - var(--dawn, 0) * 100%), var(--menta-scuro)); }
+.almost h2 { font-size: clamp(40px, 7vw, 92px); line-height: 1; }
+.almost p { font-size: clamp(20px, 2.6vw, 30px); font-family: var(--display); font-weight: 600; max-width: 26ch; line-height: 1.25; }
+.almost .w { opacity: .15; transition: opacity .35s; }
+.almost .w.on { opacity: 1; }
+#s4 .stage { color: color-mix(in srgb, var(--crema) calc(100% - var(--dawn, 0) * 100%), var(--testo)); }
+
+/* ---------- Separatore oro tra una scena e l'altra: compare piano e poi resta ---------- */
+.sep { position: absolute; left: 50%; top: 0; z-index: 3; width: min(420px, 70%); height: 24px; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 14px; pointer-events: none; opacity: 0; transition: opacity 1.6s ease; }
+.sep i { flex: 1; height: 1.5px; border-radius: 1px; transform: scaleX(.4); transition: transform 1.8s cubic-bezier(.2,.7,.2,1); }
+.sep i:first-child { background: linear-gradient(to right, transparent, var(--oro)); transform-origin: right; }
+.sep i:last-child { background: linear-gradient(to left, transparent, var(--oro)); transform-origin: left; }
+.sep b { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--oro); display: grid; place-items: center; flex: none; }
+.sep b::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--oro); }
+.sep.in { opacity: 1; }
+.sep.in i { transform: scaleX(1); }
+
+/* ---------- Finale fermo ---------- */
+.end { position: relative; background: var(--crema); padding-block: 14vh 40px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.end-inner { width: min(980px, 100%); margin: 0 auto; display: grid; gap: 40px; }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.card { background: #fff; border-radius: 28px; padding: 30px; display: grid; gap: 14px; align-content: start; box-shadow: 0 10px 30px rgba(31,74,58,.08); }
+.card h3 { font-size: 26px; }
+.card p { color: var(--grafite); }
+.btn { height: 54px; padding: 0 26px; border: none; border-radius: 27px; font: 800 17px var(--body); cursor: pointer; background: var(--menta-scuro); color: var(--crema); justify-self: start; transition: transform .15s; }
+.btn:hover { transform: translateY(-1px); }
+.btn.mint { background: var(--menta); color: var(--menta-scuro); }
+.join { display: flex; gap: 10px; flex-wrap: wrap; }
+.join input { flex: 1 1 200px; min-width: 0; height: 54px; border-radius: 27px; border: 1.5px solid var(--bordo); background: var(--crema); padding: 0 20px; font: 600 17px var(--body); color: var(--testo); }
+.join input:focus, .field:focus { outline: 3px solid var(--menta); border-color: var(--menta-medio); }
+.ok { font-weight: 700; color: var(--menta-scuro); }
+.fine { font-size: 13px; color: var(--grafite); }
+footer { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; justify-content: space-between; padding-top: 26px; border-top: 1px solid var(--bordo); font-size: 14px; color: var(--grafite); }
+footer a { color: inherit; }
+footer .by { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Finestra "Contattaci" */
+.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(21,51,42,.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.modal.open { opacity: 1; pointer-events: auto; }
+.sheet { width: min(520px, 100%); background: var(--crema); border-radius: 30px; padding: 30px; display: grid; gap: 16px; transform: translateY(24px) scale(.97); transition: transform .4s cubic-bezier(.2,.9,.3,1.2); box-shadow: 0 30px 80px rgba(21,51,42,.3); }
+.modal.open .sheet { transform: none; }
+.sheet h3 { font-size: 28px; }
+.sheet label { display: grid; gap: 6px; font-size: 14px; font-weight: 700; color: var(--grafite); }
+.field { width: 100%; border-radius: 18px; border: 1.5px solid var(--bordo); background: #fff; padding: 14px 16px; font: 600 16px var(--body); color: var(--testo); }
+textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
+.sheet .row { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.btn.ghost { background: transparent; color: var(--testo); }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.btn:disabled { opacity: .6; cursor: default; }
+
+@media (max-width: 760px) {
+  .loop-wrap { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .city { max-height: 42vh; }
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .line { font-size: clamp(26px, 7.4vw, 40px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo .arc, .logo .pin, .logo .car, .word, .word span, .motto, .cue span { animation: none !important; opacity: 1 !important; transform: none !important; stroke-dashoffset: 0 !important; }
+  .line, .hint, .almost .w { transition: none !important; }
+}
+</style>
 </head>
 <body>
-<div class="center">
-  <div class="panel">
-    <img src="logo.png" alt="">
-    <h1>Parkeely<span style="color: var(--oro)">.</span></h1>
-    <p>Il parcheggio social, senza stress. Chi sta per lasciare il posto lo dice con un tocco, chi arriva lo prenota e lo trova libero.</p>
-    <p><strong>In arrivo su iPhone e Android.</strong></p>
-    <p style="font-size: 15px"><a href="privacy.html">Informativa privacy</a> · <a href="termini.html">Termini di servizio</a></p>
-    <p style="font-size: 13px"><span class="by"><img src="chooly.svg" alt="" width="16" height="16">Un'app Chooly · © 2026</span></p>
-  </div>
+
+<div class="backdrop" aria-hidden="true"><div class="stars2"></div></div>
+<div class="floaters" id="floaters" aria-hidden="true"></div>
+
+<header class="top" aria-hidden="false">
+  <span class="mark">Parkeely<span>.</span></span>
+  <button class="soon" type="button" data-open-contact>Contattaci</button>
+</header>
+
+<main>
+  <!-- 1 · Logo e motto -->
+  <section class="scene" id="s1" aria-label="Parkeely">
+    <div class="stage">
+      <div class="hero">
+        <svg class="logo" viewBox="0 0 120 120" role="img" aria-label="Logo Parkeely">
+          <path class="arc" d="M14 52 A46 46 0 0 1 106 52" stroke="#7FB7E3" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <g class="pin">
+            <path d="M60 22 C44 22 33 34 33 49 C33 70 60 100 60 100 C60 100 87 70 87 49 C87 34 76 22 60 22 Z" fill="#A6DCC3"/>
+            <circle cx="60" cy="48" r="11" fill="#FAF7F0"/>
+          </g>
+          <g class="car">
+            <path d="M62 94 L62 87 C62 84 64 82 67 82 L71 82 L77 75 L91 75 L97 82 C100 82 102 84 102 87 L102 94 Z" fill="#FAF7F0" stroke="#7CC4A3" stroke-width="3.5" stroke-linejoin="round"/>
+            <circle cx="71" cy="95" r="5" fill="#7CC4A3"/>
+            <circle cx="93" cy="95" r="5" fill="#7CC4A3"/>
+          </g>
+        </svg>
+        <h1 class="word">Parkeely<span>.</span></h1>
+        <p class="motto">Il parcheggio social, senza stress.</p>
+      </div>
+      <div class="cue" aria-hidden="true"><span><i></i>Scorri</span></div>
+    </div>
+  </section>
+
+  <!-- 2 · I giri a vuoto che diventano una linea sola -->
+  <section class="scene" id="s2" aria-label="I giri a vuoto">
+    <div class="sep" aria-hidden="true"><i></i><b></b><i></i></div>
+    <div class="stage">
+      <div class="loop-wrap">
+        <div class="lines">
+          <p class="line" data-at="0.03">Hai presente quella sensazione?</p>
+          <p class="line" data-at="0.15">Quante volte dovrò girare</p>
+          <p class="line" data-at="0.27">per sperare di trovarne uno libero?</p>
+          <div class="counter line small" data-at="0.08" aria-live="off"><b id="laps">0</b> <span id="lapsWord">giri</span> dell'isolato</div>
+          <p class="line" data-at="0.62" style="color: inherit">E se lo trovassimo <span class="mark-hi">noi</span> per te?</p>
+        </div>
+        <svg class="city" id="city" viewBox="0 0 520 420" aria-hidden="true" shape-rendering="geometricPrecision">
+          <defs>
+            <clipPath id="mapClip"><rect width="520" height="420" rx="26"/></clipPath>
+          </defs>
+          <g clip-path="url(#mapClip)">
+            <rect width="520" height="420" fill="#F3F0E6"/>
+            <g id="map"></g>
+            <!-- il giro intorno all'isolato centrale -->
+            <path id="loop" d="M175 145 L345 145 L345 285 L175 285 Z" fill="none" stroke="none"/>
+            <path id="trail" d="M175 145 L345 145 L345 285 L175 285 Z" fill="none" stroke="#1F4A3A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0 9999"/>
+            <!-- la strada giusta, una volta sola -->
+            <path id="direct" d="M0 285 L175 285 L175 145 L300 145" fill="none" stroke="#3E9E78" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0 9999"/>
+            <g id="dest" opacity="0" transform="translate(300 155)">
+              <circle r="16" fill="#F2C14E" opacity=".35"><animate attributeName="r" values="10;18;10" dur="2.2s" repeatCount="indefinite"/></circle>
+              <rect x="-9" y="-5" width="18" height="10" rx="2" fill="none" stroke="#F2C14E" stroke-width="2" stroke-dasharray="3 2"/>
+              <circle r="4" fill="#F2C14E"/>
+            </g>
+            <g id="car"><rect x="-9" y="-5.5" width="18" height="11" rx="3.5" fill="#1F4A3A"/><rect x="2" y="-4" width="4.5" height="8" rx="1.5" fill="#A6DCC3"/></g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · Tre parole, di notte -->
+  <section class="scene" id="s3" aria-label="Come sarà">
+    <div class="sep" aria-hidden="true"><i></i><b></b><i></i></div>
+    <div class="stage">
+      <canvas class="stars" id="stars" aria-hidden="true"></canvas>
+      <div class="hints">
+        <div class="hint" data-i="0">
+          <svg viewBox="0 0 92 92" fill="none" stroke="#F2C14E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M46 80 C46 80 22 56 22 38 C22 24 33 14 46 14 C59 14 70 24 70 38 C70 56 46 80 46 80 Z"/><circle cx="46" cy="38" r="9"/></svg>
+          <h2>Pratico<span>.</span></h2>
+          <p>Pensato per le strade che fai ogni giorno.</p>
+        </div>
+        <div class="hint" data-i="1">
+          <svg viewBox="0 0 92 92" fill="none" stroke="#F2C14E" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><circle cx="32" cy="38" r="11"/><circle cx="60" cy="38" r="11"/><path d="M14 74 C16 60 24 54 32 54 C40 54 44 58 46 62 C48 58 52 54 60 54 C68 54 76 60 78 74"/></svg>
+          <h2>Sociale<span>.</span></h2>
+          <p>Nasce da chi guida, per chi guida.</p>
+        </div>
+        <div class="hint" data-i="2">
+          <svg viewBox="0 0 92 92" fill="none" stroke="#F2C14E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="46" cy="30" r="8"/><circle cx="46" cy="30" r="18" opacity=".45"/><path d="M40 44 L40 30 C40 26 46 26 46 30 L46 46 L56 48 C60 49 62 52 61 56 L58 70 C57 74 54 76 50 76 L42 76 C38 76 36 74 34 71 L28 60 C26 56 30 52 34 55 L40 60"/></svg>
+          <h2>Semplice<span>.</span></h2>
+          <p>Trovare un parcheggio in un solo click.</p>
+        </div>
+      </div>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <!-- 4 · Siamo quasi pronti -->
+  <section class="scene" id="s4" aria-label="Siamo quasi pronti">
+    <div class="sep" aria-hidden="true"><i></i><b></b><i></i></div>
+    <div class="stage">
+      <div class="sky" aria-hidden="true"></div>
+      <div class="almost">
+        <span class="kicker">In arrivo</span>
+        <h2 id="almostTitle">Siamo quasi pronti.</h2>
+        <p id="almostText">A rendere la ricerca di un parcheggio un'esperienza rilassante.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Finale -->
+  <section class="end" aria-label="Contatti e lista d'attesa">
+    <div class="sep" aria-hidden="true"><i></i><b></b><i></i></div>
+    <div class="end-inner">
+      <div class="cards">
+        <div class="card">
+          <h3>Parliamone.</h3>
+          <p>Hai una domanda, una curiosità o semplicemente vuoi conoscerci? Scrivici: rispondiamo noi, persone vere.</p>
+          <button class="btn" type="button" data-open-contact>Contattaci</button>
+        </div>
+        <form class="card" id="joinForm" novalidate>
+          <h3>Resta aggiornato.</h3>
+          <p>Iscriviti alla nostra mailing list: ti scriviamo solo quando c'è qualcosa da farti sapere, a partire dal giorno del lancio.</p>
+          <div class="join">
+            <label for="joinEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">La tua email</label>
+            <input id="joinEmail" type="email" placeholder="La tua email" autocomplete="email" required>
+            <input class="hp" id="joinWeb" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <button class="btn mint" type="submit">Iscriviti</button>
+          </div>
+          <p class="fine" id="joinMsg">Puoi cancellarti quando vuoi, con un clic. Leggi l'<a href="privacy.html" style="color:inherit">informativa privacy</a>.</p>
+        </form>
+      </div>
+      <footer>
+        <span>Parkeely<span style="color:var(--oro)">.</span> · Il parcheggio social, senza stress.</span>
+        <span><a href="privacy.html">Privacy</a> · <a href="termini.html">Termini</a></span>
+        <span class="by"><svg width="16" height="16" viewBox="0 0 120 120" aria-hidden="true"><path d="M92 34 A40 40 0 1 0 92 86" fill="none" stroke="#1F4A3A" stroke-width="14" stroke-linecap="round"/><circle cx="56" cy="60" r="13" fill="#A6DCC3"/><circle cx="80" cy="60" r="13" fill="#F2C14E"/></svg>Un'app Chooly · © 2026</span>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="contact" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+  <form class="sheet" id="contactForm" novalidate>
+    <h3 id="contactTitle">Scrivici.</h3>
+    <label for="cEmail">La tua email
+      <input class="field" id="cEmail" type="email" autocomplete="email" placeholder="nome@esempio.it" required>
+    </label>
+    <label for="cMsg">Messaggio
+      <textarea class="field" id="cMsg" placeholder="Raccontaci tutto…" required maxlength="2000"></textarea>
+    </label>
+    <input class="hp" id="cWeb" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="fine" id="cNote">Ti rispondiamo da assistenza@parkeely.it. Leggi l'<a href="privacy.html" style="color:inherit">informativa privacy</a>.</p>
+    <div class="row">
+      <button class="btn ghost" type="button" data-close>Chiudi</button>
+      <button class="btn" type="submit">Invia</button>
+    </div>
+  </form>
 </div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const ease = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  const s1 = $('#s1'), s2 = $('#s2'), s3 = $('#s3'), s4 = $('#s4');
+  const progress = (el) => {
+    const r = el.getBoundingClientRect();
+    return clamp(-r.top / (r.height - innerHeight));
+  };
+
+  // Separatori: appena il passaggio tra due scene entra nello schermo compaiono, e poi restano
+  const seps = $$('.sep');
+  const placeSeps = () => {
+    for (const el of seps) if (!el.classList.contains('in') && el.getBoundingClientRect().top < innerHeight * 0.85) el.classList.add('in');
+  };
+  if (reduce) seps.forEach((el) => el.classList.add('in'));
+
+  // Scena 2: la mappa del quartiere, disegnata una volta all'avvio (sempre uguale)
+  (() => {
+    const NS = 'http://www.w3.org/2000/svg', map = $('#map');
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const el = (tag, attrs, parent = map) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+    const ROAD = 30, XS = [0, 160, 190, 330, 360, 520], YS = [0, 130, 160, 270, 300, 420];
+    // strade con mezzeria tratteggiata
+    for (const y of [145, 285]) { el('rect', { x: 0, y: y - ROAD / 2, width: 520, height: ROAD, fill: '#FFFFFF' }); el('line', { x1: 0, y1: y, x2: 520, y2: y, stroke: '#E4DED0', 'stroke-width': 1.5, 'stroke-dasharray': '8 7' }); }
+    for (const x of [175, 345]) { el('rect', { x: x - ROAD / 2, y: 0, width: ROAD, height: 420, fill: '#FFFFFF' }); el('line', { x1: x, y1: 0, x2: x, y2: 420, stroke: '#E4DED0', 'stroke-width': 1.5, 'stroke-dasharray': '8 7' }); }
+    // incroci puliti con strisce pedonali
+    for (const x of [175, 345]) for (const y of [145, 285]) {
+      el('rect', { x: x - ROAD / 2, y: y - ROAD / 2, width: ROAD, height: ROAD, fill: '#FFFFFF' });
+      for (let i = 0; i < 5; i++) {
+        el('rect', { x: x - 12 + i * 5.5, y: y - ROAD / 2 - 7, width: 3, height: 6, fill: '#ECE7DA' });
+        el('rect', { x: x - 12 + i * 5.5, y: y + ROAD / 2 + 1, width: 3, height: 6, fill: '#ECE7DA' });
+      }
+    }
+    const kinds = [['case', 'citta', 'citta'], ['parco', 'citta', 'case'], ['citta', 'case', 'parco']];
+    const blocks = [];
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) blocks.push({ x0: XS[c * 2] + (c ? 0 : -20), x1: XS[c * 2 + 1] + (c === 2 ? 20 : 0), y0: YS[r * 2] + (r ? 0 : -20), y1: YS[r * 2 + 1] + (r === 2 ? 20 : 0), kind: kinds[r][c] });
+    for (const b of blocks) {
+      // marciapiede e terreno dell'isolato
+      el('rect', { x: b.x0 + 2, y: b.y0 + 2, width: b.x1 - b.x0 - 4, height: b.y1 - b.y0 - 4, rx: 9, fill: '#E9E4D6' });
+      const g = { x0: b.x0 + 8, y0: b.y0 + 8, x1: b.x1 - 8, y1: b.y1 - 8 };
+      if (b.kind === 'parco') {
+        el('rect', { x: g.x0, y: g.y0, width: g.x1 - g.x0, height: g.y1 - g.y0, rx: 7, fill: '#BFE3CF' });
+        el('path', { d: `M${g.x0} ${g.y1 - 18} C ${g.x0 + 50} ${g.y1 - 60}, ${g.x1 - 60} ${g.y0 + 70}, ${g.x1} ${g.y0 + 22}`, fill: 'none', stroke: '#F3F0E6', 'stroke-width': 6, 'stroke-linecap': 'round' });
+        el('ellipse', { cx: (g.x0 + g.x1) / 2 + 18, cy: (g.y0 + g.y1) / 2 + 14, rx: 16, ry: 9, fill: '#A9D3E8' });
+        for (let i = 0; i < 16; i++) {
+          const x = g.x0 + 10 + rnd() * (g.x1 - g.x0 - 20), y = g.y0 + 10 + rnd() * (g.y1 - g.y0 - 20), rr = 5 + rnd() * 5;
+          el('circle', { cx: x + 2, cy: y + 2.5, r: rr, fill: '#9CCBB2' });
+          el('circle', { cx: x, cy: y, r: rr, fill: i % 3 ? '#7CC4A3' : '#8FCDAE' });
+        }
+      } else if (b.kind === 'case') {
+        el('rect', { x: g.x0, y: g.y0, width: g.x1 - g.x0, height: g.y1 - g.y0, rx: 7, fill: '#D3EBDD' });
+        const cols = Math.floor((g.x1 - g.x0) / 34), rows = Math.floor((g.y1 - g.y0) / 34);
+        const roofs = ['#F2D6BE', '#EBC7A9', '#F6E3CC', '#E8D3C0'];
+        for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+          const w = 20 + rnd() * 6, h = 15 + rnd() * 5;
+          const x = g.x0 + 7 + i * ((g.x1 - g.x0 - 14) / cols) + rnd() * 4, y = g.y0 + 7 + j * ((g.y1 - g.y0 - 14) / rows) + rnd() * 4;
+          el('rect', { x: x + 2.5, y: y + 3, width: w, height: h, rx: 2, fill: '#B9D6C5' });
+          el('rect', { x, y, width: w, height: h, rx: 2, fill: roofs[(i + j) % roofs.length] });
+          el('rect', { x, y, width: w, height: h / 2, rx: 2, fill: '#FFFFFF', opacity: .28 });
+          el('line', { x1: x + 2, y1: y + h / 2, x2: x + w - 2, y2: y + h / 2, stroke: '#C99E7E', 'stroke-width': 1 });
+          if (rnd() > .5) el('circle', { cx: x + w + 6, cy: y + h - 2, r: 4, fill: '#7CC4A3' });
+        }
+      } else {
+        // palazzi in rilievo, divisi in lotti
+        let x = g.x0;
+        while (x < g.x1 - 14) {
+          const w = Math.min(g.x1 - x, 26 + rnd() * 26);
+          let y = g.y0;
+          while (y < g.y1 - 14) {
+            const h = Math.min(g.y1 - y, 24 + rnd() * 30);
+            const d = 3 + rnd() * 5; // altezza → ombra più lunga
+            el('rect', { x: x + d, y: y + d, width: w - 5, height: h - 5, rx: 2.5, fill: '#C9DCD1' });
+            el('rect', { x, y, width: w - 5, height: h - 5, rx: 2.5, fill: rnd() > .25 ? '#FFFFFF' : '#F6F2E8', stroke: '#E1DCCD', 'stroke-width': .8 });
+            if (w > 30 && h > 30) el('rect', { x: x + 6, y: y + 6, width: 8, height: 6, rx: 1.5, fill: '#E9E4D6' });
+            y += h;
+          }
+          x += w;
+        }
+      }
+    }
+    // auto parcheggiate lungo i marciapiedi (tutto pieno, tranne un posto)
+    const tints = ['#E7E2D6', '#A9C2D3', '#D9B48F', '#B7C9BF', '#F0EEE8', '#C9A9A0', '#8FA5B8', '#D8D2C4'];
+    const park = (x, y, horiz) => { const w = horiz ? 13 : 7, h = horiz ? 7 : 13; el('rect', { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: 2.2, fill: tints[Math.floor(rnd() * tints.length)], stroke: '#FFFFFF', 'stroke-width': .8 }); };
+    for (const y of [145, 285]) for (const side of [-10, 10]) for (let x = 8; x < 520; x += 17) {
+      if (Math.abs(x - 175) < 26 || Math.abs(x - 345) < 26) continue;
+      if (y === 145 && side === 10 && Math.abs(x - 300) < 9) continue; // il posto libero
+      park(x, y + side, true);
+    }
+    for (const x of [175, 345]) for (const side of [-10, 10]) for (let y = 8; y < 420; y += 17) {
+      if (Math.abs(y - 145) < 26 || Math.abs(y - 285) < 26) continue;
+      park(x + side, y, false);
+    }
+  })();
+
+  // Simboli sullo sfondo: disegni a linea, molto trasparenti, sempre uguali (posizioni con seme fisso)
+  const ICONS = {
+    p: '<rect x="4" y="4" width="40" height="40" rx="9"/><path d="M18 36 V12 H26 C31 12 34 15 34 19.5 C34 24 31 27 26 27 H18"/>',
+    car: '<path d="M6 30 V24 C6 22 7.5 20.5 9.5 20 L14 19 L19 12 C20 10.8 21.4 10 23 10 H31 C33 10 34.5 11 35.5 12.5 L40 19 C42.5 19.5 44 21.5 44 24 V30 Z"/><circle cx="15" cy="31" r="4.5"/><circle cx="35" cy="31" r="4.5"/><path d="M19.5 19 H37"/>',
+    moto: '<circle cx="11" cy="32" r="7"/><circle cx="38" cy="32" r="7"/><path d="M11 32 L19 20 H29 L38 32 M24 20 L21 13 H16 M29 20 L33 14 H38"/>',
+    cone: '<path d="M18 8 H30 L38 38 H10 Z"/><path d="M14.5 22 H33.5 M12 30 H36"/><path d="M6 40 H42"/>',
+    light: '<rect x="15" y="4" width="18" height="36" rx="7"/><circle cx="24" cy="12.5" r="3.5"/><circle cx="24" cy="22" r="3.5"/><circle cx="24" cy="31.5" r="3.5"/><path d="M24 40 V46"/>',
+    turn: '<path d="M14 44 V24 C14 18 18 14 24 14 H36"/><path d="M30 8 L36 14 L30 20"/>',
+    pin: '<path d="M24 44 C24 44 10 30 10 19 C10 11 16.5 5 24 5 C31.5 5 38 11 38 19 C38 30 24 44 24 44 Z"/><circle cx="24" cy="19" r="5"/>',
+    wheel: '<circle cx="24" cy="24" r="18"/><circle cx="24" cy="24" r="5"/><path d="M6.5 21 H19 M29 21 H41.5 M24 29 V42"/>',
+    key: '<circle cx="15" cy="24" r="8"/><path d="M23 24 H43 M37 24 V30 M42 24 V29"/>',
+    lane: '<path d="M24 2 V12 M24 20 V30 M24 38 V48"/>',
+    sign: '<circle cx="24" cy="20" r="14"/><path d="M14 30 L34 10"/><path d="M24 34 V46"/>',
+    bike: '<circle cx="10" cy="32" r="8"/><circle cx="38" cy="32" r="8"/><path d="M10 32 L18 18 H31 L38 32 M18 18 L24 32 L31 18 M16 12 H21"/>',
+  };
+  const floatLayer = $('#floaters');
+  const floaters = [];
+  (() => {
+    let seed = 42;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const names = Object.keys(ICONS);
+    const count = innerWidth < 700 ? 11 : 20;
+    for (let i = 0; i < count; i++) {
+      const depth = rnd();                       // 0 = lontano, 1 = vicino
+      const size = Math.round(26 + depth * 70);  // i vicini sono più grandi…
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      el.setAttribute('viewBox', '0 0 48 48');
+      el.setAttribute('width', size); el.setAttribute('height', size);
+      el.innerHTML = ICONS[names[i % names.length]];
+      el.style.opacity = (0.07 + depth * 0.09).toFixed(3);
+      el.style.strokeWidth = (2.4 - depth * 0.8).toFixed(2);
+      floatLayer.appendChild(el);
+      // Su schermi larghi stanno ai lati, lontano dalle scritte; sul telefono ovunque ma più tenui
+      const side = rnd(), wide = innerWidth >= 700;
+      const x = wide ? (side < .5 ? side * 0.6 : 0.7 + (side - .5) * 0.6) : side;
+      if (!wide) el.style.opacity = (0.05 + depth * 0.06).toFixed(3);
+      floaters.push({ el, size, x, y: rnd(), speed: 0.12 + depth * 0.45, rot: (rnd() - .5) * 40, spin: (rnd() - .5) * 0.02 });
+    }
+  })();
+  const placeFloaters = () => {
+    const W = innerWidth, H = innerHeight, span = H * 1.5, y0 = scrollY;
+    for (const f of floaters) {
+      // …e scorrono più veloci: profondità. Quando escono in alto rientrano dal basso.
+      const raw = f.y * span - y0 * f.speed;
+      const y = ((raw % span) + span) % span - H * 0.25;
+      const x = f.x * (W - f.size * 0.5) - f.size * 0.25;
+      f.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${(f.rot + y0 * f.spin).toFixed(2)}deg)`;
+    }
+  };
+  placeFloaters();
+
+  // Scena 2: geometria del giro
+  const loop = $('#loop'), trail = $('#trail'), direct = $('#direct'), car = $('#car'), dest = $('#dest'), laps = $('#laps');
+  const lapsWord = $('#lapsWord');
+  const L = loop.getTotalLength(), D = direct.getTotalLength();
+  const lines2 = $$('#s2 .line');
+
+  // Scena 3
+  const hints = $$('.hint'), dots = $$('.dots i');
+
+  // Scena 4: parola per parola
+  const wrapWords = (el) => { el.innerHTML = el.textContent.split(' ').map((w) => `<span class="w">${w}</span>`).join(' '); return $$('.w', el); };
+  const words = [...wrapWords($('#almostTitle')), ...wrapWords($('#almostText'))];
+
+  // Stelle (solo decorazione)
+  const cv = $('#stars'), cx = cv.getContext('2d');
+  let stars = [];
+  const sizeStars = () => {
+    const d = Math.min(2, devicePixelRatio || 1);
+    cv.width = innerWidth * d; cv.height = innerHeight * d;
+    cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+    cx.setTransform(d, 0, 0, d, 0, 0);
+    stars = Array.from({ length: Math.round(innerWidth * innerHeight / 9000) }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: Math.random() * 1.4 + .3, t: Math.random() * 6 }));
+  };
+  const drawStars = (p, time) => {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const s of stars) {
+      const a = (.25 + .35 * Math.sin(time / 900 + s.t)) * clamp(p * 4) * clamp((1 - p) * 4 + .2);
+      cx.fillStyle = `rgba(250,247,240,${a})`;
+      cx.beginPath(); cx.arc(s.x, s.y - p * 40 * s.r, s.r, 0, 6.283); cx.fill();
+    }
+  };
+
+  let scene = '';
+  const frame = (time) => {
+    const p1 = progress(s1), p2 = progress(s2), p3 = progress(s3), p4 = progress(s4);
+    placeFloaters();
+    placeSeps();
+    const root = document.documentElement.style;
+
+    // 1 · il logo sale e il cerchio menta riempie lo schermo
+    root.setProperty('--p1', p1.toFixed(4));
+    // lo sfondo passa dal crema al verde mentre scorri (e il logo svanisce)
+    root.setProperty('--zoom', ease(clamp((p1 - .05) / .75)).toFixed(4));
+    root.setProperty('--mark', p1 > .5 ? 1 : 0);
+
+    // 2 · tre giri intorno all'isolato, poi la linea diretta
+    const loopsP = clamp(p2 / .55);            // 0 → 3 giri
+    const total = loopsP * 3;
+    const along = (total % 1) * L;
+    car.setAttribute('opacity', p2 > .56 && p2 < .64 ? '0' : '1');
+    if (p2 < .58) {
+      const pt = loop.getPointAtLength(along === 0 && total > 0 ? L : along);
+      const ahead = loop.getPointAtLength(Math.min(L, (along || (total > 0 ? L : 0)) + 1));
+      const ang = Math.atan2(ahead.y - pt.y, ahead.x - pt.x) * 180 / Math.PI;
+      car.setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${ang})`);
+      trail.setAttribute('stroke-dasharray', `${Math.min(L, total * L)} 9999`);
+      trail.setAttribute('stroke-opacity', String(.25 + .25 * Math.min(3, total)));
+      direct.setAttribute('stroke-dasharray', `0 9999`);
+      dest.setAttribute('opacity', '0');
+    } else {
+      const q = ease(clamp((p2 - .64) / .2));
+      trail.setAttribute('stroke-opacity', String(clamp(1 - q * 1.5) * .9));
+      direct.setAttribute('stroke-dasharray', `${q * D} 9999`);
+      const pt = direct.getPointAtLength(q * D), ahead = direct.getPointAtLength(Math.min(D, q * D + 1));
+      const ang = q >= 1 ? 0 : Math.atan2(ahead.y - pt.y, ahead.x - pt.x) * 180 / Math.PI;
+      car.setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${ang})`);
+      dest.setAttribute('opacity', String(clamp(q * 3)));
+    }
+    const nLaps = p2 < .58 ? Math.floor(total) : 1;
+    laps.textContent = nLaps;
+    lapsWord.textContent = nLaps === 1 ? 'giro' : 'giri';
+    for (const l of lines2) l.classList.toggle('on', p2 >= +l.dataset.at);
+    // il buio arriva mentre la scena del giro scorre via e sale quella della notte
+    const dusk = ease(clamp((innerHeight * 1.15 - s3.getBoundingClientRect().top) / (innerHeight * 1.15)));
+    root.setProperty('--dusk', dusk.toFixed(4));
+
+    // 3 · una parola alla volta
+    const idx = Math.min(2, Math.floor(p3 * 3.2));
+    hints.forEach((h, i) => { h.classList.toggle('on', i === idx); h.classList.toggle('gone', i < idx); });
+    dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+    drawStars(p3, time || 0);
+
+    // 4 · notte → giorno, le parole si accendono
+    const dawn = ease(clamp((p4 - .1) / .6));
+    root.setProperty('--dawn', dawn.toFixed(4));
+    const lit = Math.floor(clamp(p4 / .75) * words.length + .001);
+    words.forEach((w, i) => w.classList.toggle('on', i < lit));
+
+    // Colore della barra in alto secondo la scena
+    const r3 = s3.getBoundingClientRect(), r2 = s2.getBoundingClientRect(), r4 = s4.getBoundingClientRect();
+    const now = (r3.top <= 40 && r3.bottom > 40) || (r2.top <= 40 && r2.bottom > 40 && dusk > .5) ? 'night' : (r4.top <= 40 && r4.bottom > 40 && dawn < .5) ? 'mint2' : (r2.top <= 40 && r2.bottom > 40) || (p1 > .7 && r2.top > 40) ? 'mint' : 'day';
+    if (now !== scene) { scene = now; document.body.dataset.scene = now; }
+
+    requestAnimationFrame(frame);
+  };
+
+  if (reduce) {
+    // Movimento ridotto: tutto visibile, niente animazioni legate allo scorrimento
+    lines2.forEach((l) => l.classList.add('on'));
+    hints.forEach((h) => { h.style.position = 'static'; h.classList.add('on'); });
+    $('.hints').style.display = 'grid'; $('.hints').style.gap = '60px';
+    s2.style.height = s3.style.height = s4.style.height = s1.style.height = 'auto';
+    $$('.stage').forEach((st) => { st.style.position = 'relative'; st.style.height = 'auto'; st.style.minHeight = '100vh'; st.style.paddingBlock = '80px'; });
+    words.forEach((w) => w.classList.add('on'));
+    document.documentElement.style.setProperty('--dawn', 1);
+    document.documentElement.style.setProperty('--dusk', 0);
+    document.documentElement.style.setProperty('--zoom', 1);
+    s3.querySelector('.stage').style.background = 'var(--notte)';
+    document.documentElement.style.setProperty('--mark', 1);
+    dest.setAttribute('opacity', '1'); direct.setAttribute('stroke-dasharray', `${D} 9999`); laps.textContent = '1';
+    car.setAttribute('transform', 'translate(345 145)');
+  } else {
+    sizeStars(); addEventListener('resize', sizeStars);
+    requestAnimationFrame(frame);
+  }
+
+  // Contattaci
+  const modal = $('#contact'), form = $('#contactForm');
+  let lastFocus = null;
+  const open = () => { lastFocus = document.activeElement; modal.classList.add('open'); setTimeout(() => $('#cEmail').focus(), 50); };
+  const close = () => { modal.classList.remove('open'); lastFocus && lastFocus.focus(); };
+  $$('[data-open-contact]').forEach((b) => b.addEventListener('click', open));
+  $('[data-close]').addEventListener('click', close);
+  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  // Collegamento a Supabase: valori PUBBLICI (gli stessi dell'app). Il sito può solo chiamare
+  // le funzioni del passo 19: non legge nessun dato.
+  const SUPA = 'https://moihtiwmykowalbsjecy.supabase.co';
+  const KEY = 'sb_publishable_GeGeIpB53gVpAfSXIZfOJQ_GuNtKlyq';
+  const call = async (fn, args) => {
+    const res = await fetch(`${SUPA}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: { apikey: KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args),
+    });
+    if (!res.ok) { let m = ''; try { m = (await res.json()).message || ''; } catch {} throw new Error(m || String(res.status)); }
+  };
+  const problem = (e) => {
+    const m = String(e && e.message || e);
+    if (m.includes('invalid_email')) return 'Controlla l’email: sembra scritta male.';
+    if (m.includes('invalid_message')) return 'Scrivi un messaggio tra 5 e 2000 caratteri.';
+    if (m.includes('too_many')) return 'Ci hai già scritto più volte nell’ultima ora: riprova più tardi.';
+    if (m.includes('busy')) return 'In questo momento riceviamo molte richieste: riprova tra qualche minuto.';
+    return 'Non è partito. Controlla la connessione e riprova, oppure scrivi ad assistenza@parkeely.it.';
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('#cEmail').value.trim(), msg = $('#cMsg').value.trim(), note = $('#cNote'), btn = form.querySelector('[type=submit]');
+    if (!/^\S+@\S+\.\S+$/.test(email)) { note.textContent = 'Controlla l’email: sembra scritta male.'; $('#cEmail').focus(); return; }
+    if (msg.length < 5) { note.textContent = 'Scrivi qualche parola in più.'; $('#cMsg').focus(); return; }
+    btn.disabled = true; btn.textContent = 'Invio…';
+    try {
+      await call('site_contact', { p_email: email, p_message: msg, p_website: $('#cWeb').value });
+      note.innerHTML = '<span class="ok">Grazie! Il messaggio è arrivato: ti rispondiamo presto.</span>';
+      form.reset();
+    } catch (err) {
+      note.textContent = problem(err);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Invia';
+    }
+  });
+
+  // Mailing list (con doppia conferma via email)
+  $('#joinForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const v = $('#joinEmail').value.trim(), msg = $('#joinMsg'), btn = e.target.querySelector('[type=submit]');
+    if (!/^\S+@\S+\.\S+$/.test(v)) { msg.textContent = 'Controlla l’email: sembra scritta male.'; $('#joinEmail').focus(); return; }
+    btn.disabled = true;
+    try {
+      await call('newsletter_join', { p_email: v, p_website: $('#joinWeb').value });
+      msg.innerHTML = '<span class="ok">Quasi fatto! Ti abbiamo mandato un’email: apri il link per confermare l’iscrizione.</span>';
+      e.target.reset();
+    } catch (err) {
+      msg.textContent = problem(err);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
