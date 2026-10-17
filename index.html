@@ -109,7 +109,10 @@ body[data-scene="dusk"] .top { color: var(--crema); }
 .line.current { font-size: clamp(32px, min(4.6vw, 6.8vh), 60px); text-shadow: 0 8px 22px rgba(31,74,58,.16), 0 0 26px rgba(255,255,255,.7); }
 .line.final.current { color: #D9A021; text-shadow: 0 8px 22px rgba(31,74,58,.12), 0 0 28px rgba(242,193,78,.45); }
 .map-col { display: grid; gap: 14px; min-width: 0; }
-.map-col .counter { justify-self: end; opacity: 0; transition: opacity .5s; }
+.map-col .counter { justify-self: end; opacity: 0; transition: opacity .5s, transform .8s cubic-bezier(.2,.8,.2,1); }
+.map-col .counter b { transition: font-size .8s cubic-bezier(.2,.8,.2,1), color .8s, text-shadow .8s; }
+/* tornato a zero: scivola al centro, lo 0 cresce e diventa oro */
+.map-col .counter.zero b { font-size: 84px; min-width: 0; line-height: .9; color: #D9A021; text-shadow: 0 0 26px rgba(242,193,78,.45); }
 .map-col .counter.on { opacity: 1; }
 .line.small { font-family: var(--body); font-weight: 700; font-size: clamp(17px, 1.8vw, 20px); color: var(--menta-scuro); }
 .counter { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; display: flex; gap: 10px; align-items: baseline; }
@@ -592,6 +595,11 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     }
     for (const l of lines2) l.classList.toggle('current', l === cur);
     counterEl.classList.toggle('on', p2 >= .08);
+    const zero = p2 >= .58;
+    counterEl.classList.toggle('zero', zero);
+    // al centro sotto la mappa: lo sposto di metà dello spazio libero (ricalcolato mentre lo 0 cresce)
+    const free = counterEl.parentElement.clientWidth - counterEl.offsetWidth;
+    counterEl.style.transform = zero ? `translateX(${(-free / 2).toFixed(1)}px)` : 'none';
     // il buio arriva mentre la scena del giro scorre via e sale quella della notte
     const dusk = ease(clamp((innerHeight * 1.15 - s3.getBoundingClientRect().top) / (innerHeight * 1.15)));
     root.setProperty('--dusk', dusk.toFixed(4));
