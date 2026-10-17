@@ -38,7 +38,7 @@ body { margin: 0; }
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: auto; }
-body { background: var(--crema); color: var(--testo); font-family: var(--body); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body { margin: 0; background: var(--crema); color: var(--testo); font-family: var(--body); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 h1, h2, h3, p { margin: 0; }
 h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; letter-spacing: -0.02em; }
 :focus-visible { outline: 3px solid var(--oro); outline-offset: 3px; }
@@ -90,7 +90,6 @@ body[data-scene="dusk"] .top { color: var(--crema); }
 @keyframes wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(10px); opacity: 0; } 100% { opacity: 0; } }
 
 /* ---------- Scena 2: i giri a vuoto ---------- */
-#s2 { height: 420vh; }
 /* Lo sfondo vive su un livello fisso dietro la pagina: il contenuto scorre sempre,
    cambia solo il colore, dal verde tenue al verde notte, mentre arriva la scena successiva */
 .backdrop { position: fixed; inset: 0; z-index: -2; background: color-mix(in srgb, var(--notte) calc(var(--dusk, 0) * 100%), color-mix(in srgb, var(--menta-tenue) calc(var(--zoom, 0) * 100%), var(--crema))); }
@@ -101,30 +100,59 @@ body[data-scene="dusk"] .top { color: var(--crema); }
 .backdrop .stars2 { position: absolute; inset: 0; opacity: var(--dusk, 0); background-image: radial-gradient(1.2px 1.2px at 12% 18%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 72% 12%, #FAF7F0 50%, transparent 51%), radial-gradient(1.4px 1.4px at 40% 70%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 86% 58%, #FAF7F0 50%, transparent 51%), radial-gradient(1.2px 1.2px at 24% 86%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 58% 36%, #FAF7F0 50%, transparent 51%); }
 #s2 .stage { background: transparent; color: color-mix(in srgb, var(--crema) calc(var(--dusk, 0) * 100%), var(--menta-scuro)); }
 .mark-hi { background: linear-gradient(transparent 58%, rgba(242,193,78,.75) 58%, rgba(242,193,78,.75) 92%, transparent 92%); padding: 0 .08em; }
-/* quattro frasi centrate rispetto alla mappa; sotto, la frase finale alla stessa altezza del contatore */
-.loop-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "lines map" "final counter"; align-items: center; column-gap: clamp(20px, 4vw, 64px); row-gap: 16px; width: min(1180px, 100%); padding-top: 56px; }
-.lines { grid-area: lines; display: grid; gap: 14px; align-self: center; }
-.final { grid-area: final; font-family: var(--display); font-weight: 700; font-size: clamp(32px, min(4.6vw, 6.8vh), 60px); line-height: 1.05; color: inherit; opacity: 0; transform: translateY(14px); text-shadow: 0 10px 16px rgba(31,74,58,.2); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
-.final.on { opacity: 1; transform: none; }
-.line { font-family: var(--display); font-weight: 700; font-size: clamp(22px, min(3vw, 4.6vh), 38px); line-height: 1.08; opacity: .18; transform: translateY(10px); text-shadow: 0 0 0 transparent; transition: opacity .5s, transform .5s, font-size .45s ease, color .45s, text-shadow .6s ease; }
-.line.on { opacity: 1; transform: none; }
-/* la frase del momento è più grande; l'ultima resta grande e diventa oro */
-.line.current { font-size: clamp(32px, min(4.6vw, 6.8vh), 60px); text-shadow: 0 10px 16px rgba(31,74,58,.2); }
-.map-col { display: contents; }
-.map-col .city { grid-area: map; }
-.map-col .counter { grid-area: counter; }
-.map-col .counter { justify-self: end; opacity: 0; transition: opacity .5s, transform .8s cubic-bezier(.2,.8,.2,1); }
-.map-col .counter b { transition: font-size .8s cubic-bezier(.2,.8,.2,1), color .8s, text-shadow .8s; }
-/* tornato a zero: scivola al centro, lo 0 cresce e diventa oro */
-.map-col .counter.zero b { font-size: 84px; min-width: 0; line-height: .9; color: #D9A021; text-shadow: 0 10px 16px rgba(92,67,10,.22); }
-.map-col .counter.on { opacity: 1; }
-.line.small { font-family: var(--body); font-weight: 700; font-size: clamp(17px, 1.8vw, 20px); color: var(--menta-scuro); }
-.counter { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; display: flex; gap: 10px; align-items: baseline; }
-.counter b { font-size: 44px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; min-width: 1.4ch; }
-.city { width: 100%; max-width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 24px 30px rgba(31,74,58,.22)) drop-shadow(0 6px 10px rgba(31,74,58,.12)); }
+/* ---------- Scena 2: la strada vista dal marciapiede di fronte ---------- */
+#s2 { height: 560vh; }
+.street-scene { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: clamp(12px, 3vh, 28px); padding-top: 56px; }
+.street-wrap { position: relative; width: 100vw; margin-inline: calc(50% - 50vw); height: min(62vh, 56vw); min-height: 260px; }
+.street { width: 100%; height: 100%; display: block; }
+.sparks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.street-text { position: relative; width: min(1100px, 100%); margin: 0 auto; min-height: clamp(96px, 16vh, 150px); display: grid; place-items: center; }
+.msgs { display: grid; place-items: center; }
+.msg { grid-area: 1 / 1; margin: 0; padding: 14px 28px; border-radius: 22px; background: #FFFFFF; color: var(--menta-scuro); font-family: var(--display); font-weight: 700; font-size: clamp(20px, 2.6vw, 32px); box-shadow: 0 12px 28px rgba(31,74,58,.14); opacity: 0; transform: translateY(16px) scale(.97); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); text-align: center; }
+.msg.on { opacity: 1; transform: none; }
+.lap-counter { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 12px; color: var(--menta-scuro); transition: opacity .6s; }
+.lap-counter b { font-family: var(--display); font-size: clamp(44px, 5vw, 64px); line-height: 1; font-variant-numeric: tabular-nums; display: inline-block; }
+.lap-counter > span { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; line-height: 1.3; }
+.lap-counter.hide { opacity: 0; }
+.lap-counter b.bump { animation: bump .5s ease; }
+@keyframes bump { 40% { transform: scale(1.25); color: #D9A021; } }
+.street-text .final { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; text-align: center; font-family: var(--display); font-weight: 700; font-size: clamp(30px, 4.4vw, 58px); line-height: 1.05; color: var(--menta-scuro); text-shadow: 0 10px 16px rgba(31,74,58,.18); opacity: 0; transform: translateY(14px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+.street-text .final.on { opacity: 1; transform: none; }
+@media (max-width: 760px) {
+  .street-wrap { height: 46vh; }
+  .street-text { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .lap-counter { position: static; transform: none; }
+  .msg { font-size: clamp(19px, 5.4vw, 26px); }
+}
+
+#s2 .sig .arc { fill: none; stroke: #E9A23B; stroke-width: 5; stroke-linecap: round; opacity: .25; }
+#s2 .sig.on .arc { animation: sig 1.5s ease-in-out infinite; }
+#s2 .sig.on .a2 { animation-delay: .2s; } #s2 .sig.on .a3 { animation-delay: .4s; }
+@keyframes sig { 0%, 100% { opacity: .2; } 35% { opacity: .85; } }
+#navArrow, #sig, #route { transition: opacity .5s; }
 
 /* ---------- Scena 3: tre parole ---------- */
 #s3 { height: 380vh; }
+/* Interludi: una frase che si scrive parola per parola e poi svanisce allo stesso modo */
+.inter { height: 230vh; }
+#i1 { height: 170vh; }
+#i1 .say { position: relative; z-index: 1; }
+.sky { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#cloudsFar, #cloudsNear, #starsFar, #starsNear { will-change: transform; }
+#i2 .say { position: relative; z-index: 1; }
+.gstar { fill: #F2C14E; transform-box: fill-box; transform-origin: center; animation: twinkle var(--d, 3s) ease-in-out var(--del, 0s) infinite; }
+@keyframes twinkle { 0%, 100% { opacity: var(--lo, .25); scale: .8; } 50% { opacity: var(--hi, .9); scale: 1.08; } }
+.sky { -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
+.inter .stage { background: transparent; }
+.say { margin: 0; max-width: 1200px; text-align: center; font-family: var(--display); font-weight: 700; font-size: clamp(28px, 3.9vw, 56px); line-height: 1.15; letter-spacing: -0.01em; }
+.say.dark { color: var(--menta-scuro); }
+.say.light { color: var(--crema); }
+.say .w { display: inline-block; opacity: 0; transform: translateY(14px); filter: blur(4px); transition: opacity .7s ease, transform .8s cubic-bezier(.2,.8,.2,1), filter .7s ease; }
+.say .w.on { opacity: 1; transform: none; filter: none; }
+.say .w.out { opacity: 0; transform: translateY(-12px); filter: blur(4px); }
+.say .gold { color: #D9A021; text-shadow: 0 8px 16px rgba(92,67,10,.18); }
+.say .gold.on:not(.out) { animation: shiver 2.4s ease-in-out .5s infinite; }
+@keyframes shiver { 0%, 60%, 100% { translate: 0 0; rotate: 0deg; } 64% { translate: -2px 0; rotate: -1.5deg; } 68% { translate: 2px 0; rotate: 1.5deg; } 72% { translate: -2px 0; rotate: -1deg; } 76% { translate: 1px 0; rotate: .5deg; } 80% { translate: 0 0; rotate: 0deg; } }
 #s3 .stage { background: transparent; color: var(--crema); }
 .hints { position: relative; width: min(980px, 100%); min-height: 60vh; display: grid; place-items: center; }
 .hint { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; gap: 22px; text-align: center; opacity: 0; transform: translateY(40px) scale(.96); transition: opacity .7s, transform .7s cubic-bezier(.2,.8,.2,1); }
@@ -195,16 +223,11 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
 .btn:disabled { opacity: .6; cursor: default; }
 
 @media (max-width: 760px) {
-  .loop-wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "lines" "map" "counter" "final"; row-gap: 10px; }
-  .final { font-size: clamp(27px, 7.8vw, 40px); }
-  .city { max-height: 42vh; }
   .cards { grid-template-columns: minmax(0, 1fr); }
-  .line { font-size: clamp(21px, 6vw, 32px); }
-  .line.current { font-size: clamp(27px, 7.8vw, 40px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .logo .arc, .logo .pin, .logo .car, .word, .word span, .motto, .cue span { animation: none !important; opacity: 1 !important; transform: none !important; stroke-dashoffset: 0 !important; }
-  .line, .hint, .almost .w { transition: none !important; }
+  .msg, .hint, .almost .w, .say .w, .gstar { transition: none !important; animation: none !important; }
 }
 </style>
 </head>
@@ -242,42 +265,79 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     </div>
   </section>
 
+  <!-- Interludio · prima della strada -->
+  <section class="scene inter" id="i1" aria-label="Diciamocelo">
+    <div class="stage">
+      <svg class="sky" id="sky" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <g id="cloudsFar"></g>
+        <g id="cloudsNear"></g>
+      </svg>
+      <p class="say dark"><span class="w">Diciamocelo,</span> <span class="w">oggi</span> <span class="w">cercare</span> <span class="w">un</span> <span class="w">parcheggio</span> <span class="w">in</span> <span class="w">città</span><br><span class="w">è</span> <span class="w">davvero</span> <span class="w">un</span> <span class="w gold">incubo</span><span class="w">!</span></p>
+    </div>
+  </section>
+
   <!-- 2 · I giri a vuoto che diventano una linea sola -->
   <section class="scene" id="s2" aria-label="I giri a vuoto">
     <div class="sep" aria-hidden="true"><i></i><b></b><i></i></div>
     <div class="stage">
-      <div class="loop-wrap">
-        <div class="lines">
-          <p class="line" data-at="0.02">Hai presente quella sensazione?</p>
-          <p class="line" data-at="0.15">Quante volte dovrò girare</p>
-          <p class="line" data-at="0.28">Sperando di trovarne</p>
-          <p class="line" data-at="0.41">uno libero?</p>
-        </div>
-        <p class="final" id="finalLine">E se lo trovassimo noi per te?</p>
-        <div class="map-col">
-        <svg class="city" id="city" viewBox="0 0 520 420" aria-hidden="true" shape-rendering="geometricPrecision">
-          <defs>
-            <clipPath id="mapClip"><rect width="520" height="420" rx="26"/></clipPath>
-          </defs>
-          <g clip-path="url(#mapClip)">
-            <rect width="520" height="420" fill="#F3F0E6"/>
-            <g id="map"></g>
-            <!-- il giro intorno all'isolato centrale -->
-            <path id="loop" d="M175 145 L345 145 L345 285 L175 285 Z" fill="none" stroke="none"/>
-            <path id="trail" d="M175 145 L345 145 L345 285 L175 285 Z" fill="none" stroke="#1F4A3A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0 9999"/>
-            <!-- la strada giusta, una volta sola -->
-            <path id="direct" d="M0 285 L175 285 L175 145 L300 145" fill="none" stroke="#3E9E78" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0 9999"/>
-            <g id="dest" opacity="0" transform="translate(300 155)">
-              <circle r="16" fill="#F2C14E" opacity=".35"><animate attributeName="r" values="10;18;10" dur="2.2s" repeatCount="indefinite"/></circle>
-              <rect x="-9" y="-5" width="18" height="10" rx="2" fill="none" stroke="#F2C14E" stroke-width="2" stroke-dasharray="3 2"/>
-              <circle r="4" fill="#F2C14E"/>
+      <div class="street-scene">
+        <div class="street-wrap">
+          <svg class="street" id="street" viewBox="0 0 1600 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <g id="skyline"></g>
+            <g id="facades"></g>
+            <rect x="0" y="400" width="1600" height="32" fill="#E9E4D6"/>
+            <rect x="0" y="430" width="1600" height="7" fill="#D6CFBF"/>
+            <rect x="0" y="437" width="1600" height="165" fill="#CDD3CC"/>
+            <line x1="0" y1="526" x2="1600" y2="526" stroke="#F4F2EA" stroke-width="3" stroke-dasharray="34 26"/>
+            <g id="route" opacity="0">
+              <path id="routePath" d="M-260 588 L690 588 C750 588 760 500 800 500" fill="none" stroke="#3E9E78" stroke-opacity=".16" stroke-width="16" stroke-linecap="round"/>
+              <path id="routeDash" d="M-260 588 L690 588 C750 588 760 500 800 500" fill="none" stroke="#3E9E78" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="800" cy="500" r="9" fill="#FFFFFF" stroke="#3E9E78" stroke-opacity=".6" stroke-width="4"/>
             </g>
-            <g id="car"><rect x="-9" y="-5.5" width="18" height="11" rx="3.5" fill="#1F4A3A"/><rect x="2" y="-4" width="4.5" height="8" rx="1.5" fill="#A6DCC3"/></g>
-          </g>
-        </svg>
-          <div class="counter" id="counter" aria-live="off"><b id="laps">0</b> <span id="lapsWord">giri</span> dell'isolato</div>
+            <g id="parked"></g>
+            <g id="sig" class="sig" opacity="0">
+              <circle cx="0" cy="0" r="5" fill="#E9A23B"/>
+              <path class="arc a1" d="M-14 -10 Q0 -22 14 -10" />
+              <path class="arc a2" d="M-25 -19 Q0 -40 25 -19" />
+              <path class="arc a3" d="M-36 -28 Q0 -58 36 -28" />
+            </g>
+            <g id="pin" opacity="0">
+              <path d="M0 0 C-26 -30 -34 -46 -34 -62 C-34 -82 -18 -96 0 -96 C18 -96 34 -82 34 -62 C34 -46 26 -30 0 0 Z" fill="#F2C14E" stroke="#FFFFFF" stroke-width="4"/>
+              <circle cx="0" cy="-62" r="18" fill="#FFFFFF"/>
+              <text x="0" y="-54" text-anchor="middle" font-family="Quicksand, sans-serif" font-weight="700" font-size="24" fill="#1F4A3A">P</text>
+            </g>
+            <g id="hero"></g>
+            <g id="navArrow" opacity="0">
+              <circle r="24" fill="#FFFFFF" stroke="#3E9E78" stroke-opacity=".35" stroke-width="3"/>
+              <path d="M-10 -11 L13 0 L-10 11 L-5 0 Z" fill="#3E9E78" stroke="#3E9E78" stroke-width="3" stroke-linejoin="round"/>
+            </g>
+            <rect x="0" y="602" width="1600" height="8" fill="#D6CFBF"/>
+            <rect x="0" y="610" width="1600" height="30" fill="#E9E4D6"/>
+          </svg>
+          <canvas class="sparks" id="sparks"></canvas>
+        </div>
+        <div class="street-text">
+          <div class="msgs" aria-live="polite">
+            <p class="msg">Hai presente quella sensazione?</p>
+            <p class="msg">Quante volte dovrò girare</p>
+            <p class="msg">Sperando di trovarne</p>
+            <p class="msg">uno libero?</p>
+          </div>
+          <div class="lap-counter hide" id="lapCounter"><b id="laps">0</b><span><span id="lapsWord">giri</span><br>dell'isolato</span></div>
+          <p class="final" id="finalLine">E se lo trovassimo noi per te?</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Interludio · prima delle tre parole -->
+  <section class="scene inter" id="i2" aria-label="Sarebbe sicuramente più">
+    <div class="stage">
+      <svg class="sky" id="goldSky" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g id="starsFar"></g>
+        <g id="starsNear"></g>
+      </svg>
+      <p class="say light"><span class="w">Sarebbe</span> <span class="w">sicuramente</span> <span class="w">più…</span></p>
     </div>
   </section>
 
@@ -377,7 +437,61 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const ease = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-  const s1 = $('#s1'), s2 = $('#s2'), s3 = $('#s3'), s4 = $('#s4');
+  const s1 = $('#s1'), s2 = $('#s2'), s3 = $('#s3'), s4 = $('#s4'), i1 = $('#i1'), i2 = $('#i2');
+  const sayWords = [$$('#i1 .w'), $$('#i2 .w')];
+  // Primo interludio: si scende dal cielo verso la città (nuvole che salgono, tetti che spuntano dal basso)
+  (() => {
+    const NS2 = 'http://www.w3.org/2000/svg';
+    const mk = (tag, a, parent) => { const n = document.createElementNS(NS2, tag); for (const k in a) n.setAttribute(k, a[k]); parent.appendChild(n); return n; };
+    let sd = 7; const rr = () => ((sd = (sd * 16807) % 2147483647) / 2147483647);
+    const cloud = (parent, x, y, w, op) => {
+      const g = mk('g', { transform: `translate(${x} ${y})`, opacity: op }, parent);
+      mk('ellipse', { cx: 0, cy: 0, rx: w * .5, ry: w * .14, fill: '#FFFFFF' }, g);
+      mk('circle', { cx: -w * .18, cy: -w * .1, r: w * .16, fill: '#FFFFFF' }, g);
+      mk('circle', { cx: w * .06, cy: -w * .16, r: w * .21, fill: '#FFFFFF' }, g);
+      mk('circle', { cx: w * .27, cy: -w * .07, r: w * .13, fill: '#FFFFFF' }, g);
+    };
+    [[180, 160, 260], [1320, 120, 300], [760, 300, 200], [420, 520, 230], [1180, 470, 260], [80, 700, 210], [1480, 760, 220], [900, 820, 180], [300, 1020, 240], [1100, 1100, 220]].forEach(([x, y, w]) => cloud($('#cloudsFar'), x, y, w * .8, .45));
+    [[300, 330, 340], [1240, 260, 380], [640, 680, 300], [1450, 600, 280], [60, 980, 320], [1000, 1060, 360], [520, 1300, 300], [1350, 1380, 340]].forEach(([x, y, w]) => cloud($('#cloudsNear'), x, y, w, .8));
+  })();
+  const skyLayers = [[$('#cloudsFar'), -260], [$('#cloudsNear'), -620]];
+  // Secondo interludio: stelline d'oro nella notte, che salgono piano a due velocità
+  (() => {
+    let sd = 23; const rr = () => ((sd = (sd * 16807) % 2147483647) / 2147483647);
+    const star4 = (r) => `M0 ${-r} Q${r * .18} ${-r * .18} ${r} 0 Q${r * .18} ${r * .18} 0 ${r} Q${-r * .18} ${r * .18} ${-r} 0 Q${-r * .18} ${-r * .18} 0 ${-r} Z`;
+    const add = (parent, n, rMin, rMax, hi) => {
+      for (let k = 0; k < n; k++) {
+        const x = rr() * 1600, y = rr() * 1300 - 40, rad = rMin + rr() * (rMax - rMin);
+        // lascia libero il centro, dove c'è la frase
+        if (x > 380 && x < 1220 && y > 330 && y < 570) { k--; continue; }
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('transform', `translate(${x.toFixed(0)} ${y.toFixed(0)})`);
+        const st = document.createElementNS('http://www.w3.org/2000/svg', rad < 5 ? 'circle' : 'path');
+        if (rad < 5) st.setAttribute('r', (rad * .45).toFixed(1)); else st.setAttribute('d', star4(rad));
+        st.setAttribute('class', 'gstar');
+        st.style.setProperty('--d', `${(2.4 + rr() * 2.6).toFixed(1)}s`);
+        st.style.setProperty('--del', `${(-rr() * 4).toFixed(1)}s`);
+        st.style.setProperty('--hi', hi);
+        g.appendChild(st); parent.appendChild(g);
+      }
+    };
+    add($('#starsFar'), 90, 3, 8, .65);
+    add($('#starsNear'), 26, 9, 17, .95);
+  })();
+  skyLayers.push([$('#starsFar'), -120, true], [$('#starsNear'), -320, true]);
+  const updateSky = (q) => {
+    // q: 0 quando la sezione entra dal basso, 1 quando se ne va
+    for (const [g, up, second] of skyLayers) if (!second) g.setAttribute('transform', `translate(0 ${(up * q).toFixed(1)})`);
+  };
+  // le parole entrano una dopo l'altra, restano un momento, poi escono nello stesso ordine
+  const updateSay = (ws, p) => {
+    const n = ws.length;
+    ws.forEach((w, k) => {
+      const inAt = .06 + (k / n) * .40, outAt = .70 + (k / n) * .22;
+      w.classList.toggle('on', p >= inAt);
+      w.classList.toggle('out', p >= outAt);
+    });
+  };
   const progress = (el) => {
     const r = el.getBoundingClientRect();
     return clamp(-r.top / (r.height - innerHeight));
@@ -390,84 +504,203 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
   };
   if (reduce) seps.forEach((el) => el.classList.add('in'));
 
-  // Scena 2: la mappa del quartiere, disegnata una volta all'avvio (sempre uguale)
+  // ---------- Scena 2: la strada vista di lato ----------
+  const NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  let seed = 11;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+  // Un'auto vista di fianco (rivolta a destra). Larga 200, ruote sulla riga y=76.
+  const carShape = (color, withDriver) => {
+    const g = svgEl('g', {});
+    svgEl('ellipse', { cx: 100, cy: 92, rx: 92, ry: 7, fill: 'rgba(31,74,58,.18)' }, g);
+    svgEl('path', { d: 'M10 70 Q8 52 24 48 L52 44 Q70 18 100 16 L128 16 Q150 18 168 42 L186 46 Q198 50 196 66 L196 72 Q196 77 190 77 L14 77 Q10 77 10 70 Z', fill: color }, g);
+    svgEl('path', { d: 'M62 44 Q76 25 100 22 L111 22 L111 44 Z', fill: '#DDEFF5' }, g);
+    svgEl('path', { d: 'M117 22 L128 22 Q146 24 160 44 L117 44 Z', fill: '#DDEFF5' }, g);
+    svgEl('rect', { x: 188, y: 52, width: 8, height: 7, rx: 2, fill: '#FBEFC9' }, g);
+    svgEl('rect', { x: 10, y: 54, width: 7, height: 7, rx: 2, fill: '#E88B7A' }, g);
+    svgEl('path', { d: 'M24 60 L186 60', stroke: 'rgba(0,0,0,.08)', 'stroke-width': 2 }, g);
+    let face = null;
+    if (withDriver) {
+      face = svgEl('g', {}, g);
+      svgEl('circle', { cx: 136, cy: 33, r: 9.5, fill: '#F2C9A5' }, face);
+      svgEl('path', { d: 'M126.5 31 Q127 22 136 22 Q145 22 145.5 30 Q140 26 134 27 Q129 28 126.5 31 Z', fill: '#4A3426' }, face);
+      svgEl('circle', { cx: 133, cy: 33, r: 1.3, fill: '#2F3437' }, face);
+      svgEl('circle', { cx: 140, cy: 33, r: 1.3, fill: '#2F3437' }, face);
+      face.mouth = svgEl('path', { d: 'M132 39.5 Q136.5 36 141 39.5', stroke: '#2F3437', 'stroke-width': 1.6, fill: 'none', 'stroke-linecap': 'round' }, face);
+      face.brows = svgEl('path', { d: 'M131 29.5 L135 28.5 M138 28.5 L142 29.5', stroke: '#4A3426', 'stroke-width': 1.4, 'stroke-linecap': 'round' }, face);
+    }
+    const wheels = [45, 155].map((cx) => {
+      const w = svgEl('g', { transform: `translate(${cx} 76)` }, g);
+      svgEl('circle', { r: 16, fill: '#2F3437' }, w);
+      svgEl('circle', { r: 7, fill: '#E9E4D6' }, w);
+      svgEl('path', { d: 'M-6 0 L6 0 M0 -6 L0 6', stroke: '#9AA0A3', 'stroke-width': 2 }, w);
+      return w;
+    });
+    return { g, wheels, face };
+  };
+
+  // Palazzi visti di fronte (sempre uguali)
   (() => {
-    const NS = 'http://www.w3.org/2000/svg', map = $('#map');
-    let seed = 7;
-    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    const el = (tag, attrs, parent = map) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
-    const ROAD = 30, XS = [0, 160, 190, 330, 360, 520], YS = [0, 130, 160, 270, 300, 420];
-    // strade con mezzeria tratteggiata
-    for (const y of [145, 285]) { el('rect', { x: 0, y: y - ROAD / 2, width: 520, height: ROAD, fill: '#FFFFFF' }); el('line', { x1: 0, y1: y, x2: 520, y2: y, stroke: '#E4DED0', 'stroke-width': 1.5, 'stroke-dasharray': '8 7' }); }
-    for (const x of [175, 345]) { el('rect', { x: x - ROAD / 2, y: 0, width: ROAD, height: 420, fill: '#FFFFFF' }); el('line', { x1: x, y1: 0, x2: x, y2: 420, stroke: '#E4DED0', 'stroke-width': 1.5, 'stroke-dasharray': '8 7' }); }
-    // incroci puliti con strisce pedonali
-    for (const x of [175, 345]) for (const y of [145, 285]) {
-      el('rect', { x: x - ROAD / 2, y: y - ROAD / 2, width: ROAD, height: ROAD, fill: '#FFFFFF' });
-      for (let i = 0; i < 5; i++) {
-        el('rect', { x: x - 12 + i * 5.5, y: y - ROAD / 2 - 7, width: 3, height: 6, fill: '#ECE7DA' });
-        el('rect', { x: x - 12 + i * 5.5, y: y + ROAD / 2 + 1, width: 3, height: 6, fill: '#ECE7DA' });
-      }
-    }
-    const kinds = [['case', 'citta', 'citta'], ['parco', 'citta', 'case'], ['citta', 'case', 'parco']];
-    const blocks = [];
-    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) blocks.push({ x0: XS[c * 2] + (c ? 0 : -20), x1: XS[c * 2 + 1] + (c === 2 ? 20 : 0), y0: YS[r * 2] + (r ? 0 : -20), y1: YS[r * 2 + 1] + (r === 2 ? 20 : 0), kind: kinds[r][c] });
-    for (const b of blocks) {
-      // marciapiede e terreno dell'isolato
-      el('rect', { x: b.x0 + 2, y: b.y0 + 2, width: b.x1 - b.x0 - 4, height: b.y1 - b.y0 - 4, rx: 9, fill: '#E9E4D6' });
-      const g = { x0: b.x0 + 8, y0: b.y0 + 8, x1: b.x1 - 8, y1: b.y1 - 8 };
-      if (b.kind === 'parco') {
-        el('rect', { x: g.x0, y: g.y0, width: g.x1 - g.x0, height: g.y1 - g.y0, rx: 7, fill: '#BFE3CF' });
-        el('path', { d: `M${g.x0} ${g.y1 - 18} C ${g.x0 + 50} ${g.y1 - 60}, ${g.x1 - 60} ${g.y0 + 70}, ${g.x1} ${g.y0 + 22}`, fill: 'none', stroke: '#F3F0E6', 'stroke-width': 6, 'stroke-linecap': 'round' });
-        el('ellipse', { cx: (g.x0 + g.x1) / 2 + 18, cy: (g.y0 + g.y1) / 2 + 14, rx: 16, ry: 9, fill: '#A9D3E8' });
-        for (let i = 0; i < 16; i++) {
-          const x = g.x0 + 10 + rnd() * (g.x1 - g.x0 - 20), y = g.y0 + 10 + rnd() * (g.y1 - g.y0 - 20), rr = 5 + rnd() * 5;
-          el('circle', { cx: x + 2, cy: y + 2.5, r: rr, fill: '#9CCBB2' });
-          el('circle', { cx: x, cy: y, r: rr, fill: i % 3 ? '#7CC4A3' : '#8FCDAE' });
+    const sky = $('#skyline'), fac = $('#facades');
+    for (let x = -40; x < 1640; ) { const w = 90 + rnd() * 120, h = 150 + rnd() * 170; svgEl('rect', { x, y: 400 - h - 60, width: w, height: h + 60, fill: '#C6E4D4', opacity: .55 }, sky); x += w - 10; }
+    const walls = ['#FFFFFF', '#F6E3CC', '#EAF4EE', '#F3EBDD', '#E6F0F6', '#FBF3E2'];
+    let x = -20, i = 0;
+    while (x < 1620) {
+      const w = 170 + rnd() * 90, h = 190 + rnd() * 110, top = 400 - h, wall = walls[i % walls.length];
+      svgEl('rect', { x, y: top, width: w, height: h, fill: wall }, fac);
+      svgEl('rect', { x: x - 4, y: top - 8, width: w + 8, height: 10, rx: 2, fill: '#E0D8C6' }, fac);
+      const cols = Math.max(2, Math.floor((w - 30) / 46)), gap = (w - 30) / cols;
+      for (let fy = top + 22; fy < 400 - 110; fy += 58)
+        for (let c = 0; c < cols; c++) {
+          const wx = x + 15 + c * gap + (gap - 30) / 2;
+          svgEl('rect', { x: wx, y: fy, width: 30, height: 38, rx: 3, fill: rnd() > .78 ? '#FBEFC9' : '#D3E9F1', stroke: '#FFFFFF', 'stroke-width': 3 }, fac);
         }
-      } else if (b.kind === 'case') {
-        el('rect', { x: g.x0, y: g.y0, width: g.x1 - g.x0, height: g.y1 - g.y0, rx: 7, fill: '#D3EBDD' });
-        const cols = Math.floor((g.x1 - g.x0) / 34), rows = Math.floor((g.y1 - g.y0) / 34);
-        const roofs = ['#F2D6BE', '#EBC7A9', '#F6E3CC', '#E8D3C0'];
-        for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
-          const w = 20 + rnd() * 6, h = 15 + rnd() * 5;
-          const x = g.x0 + 7 + i * ((g.x1 - g.x0 - 14) / cols) + rnd() * 4, y = g.y0 + 7 + j * ((g.y1 - g.y0 - 14) / rows) + rnd() * 4;
-          el('rect', { x: x + 2.5, y: y + 3, width: w, height: h, rx: 2, fill: '#B9D6C5' });
-          el('rect', { x, y, width: w, height: h, rx: 2, fill: roofs[(i + j) % roofs.length] });
-          el('rect', { x, y, width: w, height: h / 2, rx: 2, fill: '#FFFFFF', opacity: .28 });
-          el('line', { x1: x + 2, y1: y + h / 2, x2: x + w - 2, y2: y + h / 2, stroke: '#C99E7E', 'stroke-width': 1 });
-          if (rnd() > .5) el('circle', { cx: x + w + 6, cy: y + h - 2, r: 4, fill: '#7CC4A3' });
-        }
+      // piano terra: vetrina con tenda a righe oppure portone
+      if (i % 2 === 0) {
+        svgEl('rect', { x: x + 18, y: 318, width: w - 36, height: 78, rx: 4, fill: '#D3E9F1', stroke: '#FFFFFF', 'stroke-width': 4 }, fac);
+        for (let k = 0; k < Math.floor((w - 28) / 22); k++) svgEl('rect', { x: x + 14 + k * 22, y: 300, width: 22, height: 20, fill: k % 2 ? '#FFFFFF' : (i % 4 === 0 ? '#7CC4A3' : '#F2B48C') }, fac);
       } else {
-        // palazzi in rilievo, divisi in lotti
-        let x = g.x0;
-        while (x < g.x1 - 14) {
-          const w = Math.min(g.x1 - x, 26 + rnd() * 26);
-          let y = g.y0;
-          while (y < g.y1 - 14) {
-            const h = Math.min(g.y1 - y, 24 + rnd() * 30);
-            const d = 3 + rnd() * 5; // altezza → ombra più lunga
-            el('rect', { x: x + d, y: y + d, width: w - 5, height: h - 5, rx: 2.5, fill: '#C9DCD1' });
-            el('rect', { x, y, width: w - 5, height: h - 5, rx: 2.5, fill: rnd() > .25 ? '#FFFFFF' : '#F6F2E8', stroke: '#E1DCCD', 'stroke-width': .8 });
-            if (w > 30 && h > 30) el('rect', { x: x + 6, y: y + 6, width: 8, height: 6, rx: 1.5, fill: '#E9E4D6' });
-            y += h;
-          }
-          x += w;
-        }
+        svgEl('rect', { x: x + w / 2 - 26, y: 330, width: 52, height: 70, rx: 6, fill: '#B7A48B' }, fac);
+        svgEl('circle', { cx: x + w / 2 + 14, cy: 368, r: 3, fill: '#F2C14E' }, fac);
       }
+      x += w; i++;
     }
-    // auto parcheggiate lungo i marciapiedi (tutto pieno, tranne un posto)
-    const tints = ['#E7E2D6', '#A9C2D3', '#D9B48F', '#B7C9BF', '#F0EEE8', '#C9A9A0', '#8FA5B8', '#D8D2C4'];
-    const park = (x, y, horiz) => { const w = horiz ? 13 : 7, h = horiz ? 7 : 13; el('rect', { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: 2.2, fill: tints[Math.floor(rnd() * tints.length)], stroke: '#FFFFFF', 'stroke-width': .8 }); };
-    for (const y of [145, 285]) for (const side of [-10, 10]) for (let x = 8; x < 520; x += 17) {
-      if (Math.abs(x - 175) < 26 || Math.abs(x - 345) < 26) continue;
-      if (y === 145 && side === 10 && Math.abs(x - 300) < 9) continue; // il posto libero
-      park(x, y + side, true);
-    }
-    for (const x of [175, 345]) for (const side of [-10, 10]) for (let y = 8; y < 420; y += 17) {
-      if (Math.abs(y - 145) < 26 || Math.abs(y - 285) < 26) continue;
-      park(x + side, y, false);
+    // alberi e lampioni sul marciapiede di fronte
+    for (let t = 120; t < 1600; t += 300) {
+      svgEl('rect', { x: t - 4, y: 340, width: 8, height: 64, fill: '#9C7E62' }, fac);
+      svgEl('circle', { cx: t, cy: 318, r: 34, fill: '#7CC4A3' }, fac);
+      svgEl('circle', { cx: t - 16, cy: 330, r: 22, fill: '#8FCDAE' }, fac);
+      svgEl('rect', { x: t + 148, y: 300, width: 5, height: 104, fill: '#5E6366' }, fac);
+      svgEl('path', { d: `M${t + 150} 302 q0 -14 16 -14`, stroke: '#5E6366', 'stroke-width': 5, fill: 'none' }, fac);
+      svgEl('rect', { x: t + 160, y: 286, width: 16, height: 8, rx: 3, fill: '#FBEFC9' }, fac);
     }
   })();
+
+  // Auto parcheggiate: tutto pieno. Quella al centro (x 800) se ne andrà alla fine.
+  const PARK_Y = 480, LANE_Y = 568, PS = 0.86;
+  const parkedTints = ['#A9C2D3', '#D9B48F', '#B7C9BF', '#F0EEE8', '#C9A9A0', '#8FA5B8', '#E7E2D6', '#D8D2C4', '#9DB7AB'];
+  let spotCar = null;
+  [80, 260, 440, 620, 800, 980, 1160, 1340, 1520].forEach((cx, k) => {
+    const c = carShape(parkedTints[k % parkedTints.length], false);
+    c.g.setAttribute('transform', `translate(${cx - 100 * PS} ${PARK_Y - 77 * PS}) scale(${PS})`);
+    $('#parked').appendChild(c.g);
+    if (cx === 800) spotCar = c;
+  });
+
+  // La nostra auto, con l'autista
+  const hero = carShape('#3E9E78', true);
+  $('#hero').appendChild(hero.g);
+  const pin = $('#pin'), sig = $('#sig'), navArrow = $('#navArrow'), route = $('#route'), routeDash = $('#routeDash'), routeGlow = $('#routePath');
+  const RL = routeDash.getTotalLength();
+  const msgs = $$('#s2 .msg'), laps = $('#laps'), lapsWord = $('#lapsWord'), lapCounter = $('#lapCounter'), finalEl = $('#finalLine');
+
+  // Fuochi d'artificio, solo oro, quando l'auto ha parcheggiato
+  const sparksCv = $('#sparks'), sx = sparksCv.getContext('2d');
+  let parts = [], sparksOn = false, wasHappy = false;
+  const sizeSparks = () => { const d = Math.min(2, devicePixelRatio || 1); sparksCv.width = sparksCv.clientWidth * d; sparksCv.height = sparksCv.clientHeight * d; sx.setTransform(d, 0, 0, d, 0, 0); };
+  const drawSparks = () => {
+    sx.clearRect(0, 0, sparksCv.clientWidth, sparksCv.clientHeight);
+    parts = parts.filter((q) => q.life > 0);
+    for (const q of parts) {
+      q.x += q.vx; q.y += q.vy; q.vy += 0.045; q.vx *= 0.985; q.life -= 0.011;
+      sx.globalAlpha = Math.max(0, q.life);
+      sx.fillStyle = q.col;
+      sx.beginPath(); sx.arc(q.x, q.y, q.r, 0, 6.283); sx.fill();
+    }
+    sx.globalAlpha = 1;
+    if (parts.length) requestAnimationFrame(drawSparks); else sparksOn = false;
+  };
+  const burst = () => {
+    const m = $('#street').getScreenCTM(), box = sparksCv.getBoundingClientRect();
+    if (!m) return;
+    const golds = ['#F2C14E', '#FBEFC9', '#E9A23B', '#FFD978'];
+    [[800, 170, 0], [620, 220, 320], [980, 200, 620], [800, 120, 920]].forEach(([x, y, delay]) => {
+      setTimeout(() => {
+        const cx = m.a * x + m.e - box.left, cy = m.d * y + m.f - box.top;
+        for (let k = 0; k < 48; k++) {
+          const a = (k / 48) * Math.PI * 2, v = 2.2 + Math.random() * 2.6;
+          parts.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, col: golds[k % golds.length], r: 1.6 + Math.random() * 1.8 });
+        }
+        if (!sparksOn) { sparksOn = true; requestAnimationFrame(drawSparks); }
+      }, delay);
+    });
+  };
+  sizeSparks(); addEventListener('resize', sizeSparks);
+
+  // Posizione di un'auto: x = centro, y = riga delle ruote, s = scala, spin = giro delle ruote
+  const place = (c, x, y, s, spin) => {
+    c.g.setAttribute('transform', `translate(${(x - 100 * s).toFixed(1)} ${(y - 77 * s).toFixed(1)}) scale(${s.toFixed(3)})`);
+    c.wheels.forEach((w, k) => w.setAttribute('transform', `translate(${k ? 155 : 45} 76) rotate(${(spin % 360).toFixed(1)})`));
+  };
+  const setMood = (happy) => {
+    hero.face.mouth.setAttribute('d', happy ? 'M131.5 37 Q136.5 43 141.5 37' : 'M132 39.5 Q136.5 36 141 39.5');
+    hero.face.brows.setAttribute('d', happy ? 'M131 28 L135 27.5 M138 27.5 L142 28' : 'M131 29.5 L135 28.5 M138 28.5 L142 29.5');
+  };
+  let lastLaps = -1;
+  pin.style.transition = 'transform .7s cubic-bezier(.3,1.5,.5,1), opacity .3s';
+
+  // Tempi della scena (frazione dello scorrimento della scena 2)
+  const PASS_START = 0.03, PASS_LEN = 0.16, PASSES = 4;   // quattro passaggi a vuoto
+  const SIGNAL = 0.62, LEAVE = [0.67, 0.73], ARRIVE = [0.72, 0.82], PARK = [0.82, 0.86], HAPPY = 0.87;
+
+  const updateStreet = (p2) => {
+    const done = p2 >= PASS_START + PASSES * PASS_LEN;
+    const pos = (p2 - PASS_START) / PASS_LEN;          // 0..4 durante i passaggi
+    if (!done && pos >= 0) {
+      const q = pos % 1, x = -260 + q * 2120;
+      place(hero, x, LANE_Y, 1, x * 1.8);
+    } else if (!done) {
+      place(hero, -400, LANE_Y, 1, 0);
+    }
+    // la frase del passaggio in corso
+    const msgIdx = done || pos < 0 ? -1 : Math.min(PASSES - 1, Math.floor(pos));
+    msgs.forEach((m, k) => m.classList.toggle('on', k === msgIdx));
+    // il contatore sale quando l'auto passa davanti a noi (a metà del passaggio)
+    const n = done ? PASSES : Math.min(PASSES, Math.max(0, Math.floor(pos + 0.5)));
+    if (n !== lastLaps) {
+      laps.textContent = n; lapsWord.textContent = n === 1 ? 'giro' : 'giri';
+      if (lastLaps >= 0 && n > lastLaps) { laps.classList.remove('bump'); void laps.offsetWidth; laps.classList.add('bump'); }
+      lastLaps = n;
+    }
+    lapCounter.classList.toggle('hide', done || pos < 0);
+    finalEl.classList.toggle('on', p2 >= LEAVE[1]);
+
+    // l'auto parcheggiata al centro se ne va: esce dal posto e parte verso destra
+    const lv = clamp((p2 - LEAVE[0]) / (LEAVE[1] - LEAVE[0]));
+    const out = ease(clamp(lv / 0.3)), go = ease(clamp((lv - 0.3) / 0.7));
+    const spotX = 800 + go * 1100, spotY = PARK_Y + out * (LANE_Y - PARK_Y);
+    place(spotCar, spotX, spotY, PS + out * (1 - PS), go * 1980);
+    // sopra l'auto che sta per liberare il posto: un segnale che pulsa (qualcosa sta succedendo)
+    const sigOn = p2 >= SIGNAL && lv < 0.45;
+    sig.setAttribute('opacity', sigOn ? '1' : '0');
+    sig.classList.toggle('on', sigOn);
+    sig.setAttribute('transform', `translate(${spotX.toFixed(1)} ${(spotY - 77 * PS - 22).toFixed(1)})`);
+
+    // la nostra arriva, si ferma e parcheggia
+    if (done) {
+      const ar = ease(clamp((p2 - ARRIVE[0]) / (ARRIVE[1] - ARRIVE[0])));
+      const pk = ease(clamp((p2 - PARK[0]) / (PARK[1] - PARK[0])));
+      const x = -260 + ar * 1020 + pk * 40;
+      const y = LANE_Y - pk * (LANE_Y - PARK_Y);
+      place(hero, x, y, 1 - pk * (1 - PS), x * 1.8);
+      // la freccia del navigatore sopra l'auto, e la linea a terra che indica la strada
+      navArrow.setAttribute('opacity', p2 >= ARRIVE[0] && p2 < HAPPY ? '1' : '0');
+      navArrow.setAttribute('transform', `translate(${x.toFixed(1)} ${(y - 77 - 36 + pk * 12).toFixed(1)}) rotate(${(-pk * 60 * Math.sin(pk * Math.PI)).toFixed(1)})`);
+      const used = clamp(pk > 0 ? (1020 + 90 + pk * (RL - 1110)) / RL : (x + 260 + 90) / RL) * RL;
+      [routeDash, routeGlow].forEach((pth) => pth.setAttribute('stroke-dasharray', `0 ${used.toFixed(1)} ${RL.toFixed(1)}`));
+      route.setAttribute('opacity', p2 >= ARRIVE[0] - 0.01 && p2 < HAPPY ? '1' : '0');
+    } else {
+      navArrow.setAttribute('opacity', '0');
+      route.setAttribute('opacity', '0');
+    }
+    const happy = p2 >= HAPPY;
+    setMood(happy);
+    pin.setAttribute('opacity', happy ? '1' : '0');
+    pin.style.transform = `translate(800px, ${happy ? 380 : 300}px)`;
+    if (happy && !wasHappy && !reduce) burst();
+    wasHappy = happy;
+  };
 
   // Simboli sullo sfondo: disegni a linea, molto trasparenti, sempre uguali (posizioni con seme fisso)
   const ICONS = {
@@ -520,11 +753,6 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
   };
   placeFloaters();
 
-  // Scena 2: geometria del giro
-  const loop = $('#loop'), trail = $('#trail'), direct = $('#direct'), car = $('#car'), dest = $('#dest'), laps = $('#laps');
-  const lapsWord = $('#lapsWord'), counterEl = $('#counter'), finalEl = $('#finalLine'), cityEl = $('#city');
-  const L = loop.getTotalLength(), D = direct.getTotalLength();
-  const lines2 = $$('#s2 .line');
 
   // Scena 3
   const hints = $$('.hint'), dots = $$('.dots i');
@@ -565,51 +793,24 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     root.setProperty('--zoom', ease(clamp((p1 - .05) / .75)).toFixed(4));
     root.setProperty('--mark', p1 > .5 ? 1 : 0);
 
-    // 2 · tre giri intorno all'isolato, poi la linea diretta
-    const loopsP = clamp(p2 / .55);            // 0 → 3 giri
-    const total = loopsP * 3;
-    const along = (total % 1) * L;
-    car.setAttribute('opacity', p2 > .56 && p2 < .64 ? '0' : '1');
-    if (p2 < .58) {
-      const pt = loop.getPointAtLength(along === 0 && total > 0 ? L : along);
-      const ahead = loop.getPointAtLength(Math.min(L, (along || (total > 0 ? L : 0)) + 1));
-      const ang = Math.atan2(ahead.y - pt.y, ahead.x - pt.x) * 180 / Math.PI;
-      car.setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${ang})`);
-      trail.setAttribute('stroke-dasharray', `${Math.min(L, total * L)} 9999`);
-      // finiti i giri la traccia svanisce, prima che parta la strada giusta
-      trail.setAttribute('stroke-opacity', String((.25 + .25 * Math.min(3, total)) * clamp((.58 - p2) / .03)));
-      direct.setAttribute('stroke-dasharray', `0 9999`);
-      dest.setAttribute('opacity', '0');
-    } else {
-      const q = ease(clamp((p2 - .64) / .2));
-      trail.setAttribute('stroke-opacity', '0');
-      direct.setAttribute('stroke-dasharray', `${q * D} 9999`);
-      const pt = direct.getPointAtLength(q * D), ahead = direct.getPointAtLength(Math.min(D, q * D + 1));
-      const ang = q >= 1 ? 0 : Math.atan2(ahead.y - pt.y, ahead.x - pt.x) * 180 / Math.PI;
-      car.setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${ang})`);
-      dest.setAttribute('opacity', String(clamp(q * 3)));
+    // interludi
+    {
+      const r1 = i1.getBoundingClientRect();
+      const q = clamp((innerHeight - r1.top) / r1.height);
+      updateSky(q);
+      updateSay(sayWords[0], clamp((q - .25) / .7));
     }
-    // con la strada giusta i giri a vuoto tornano a zero
-    const nLaps = p2 < .58 ? Math.floor(total) : 0;
-    laps.textContent = nLaps;
-    lapsWord.textContent = nLaps === 1 ? 'giro' : 'giri';
-    let cur = null;
-    for (const l of lines2) {
-      const on = p2 >= +l.dataset.at;
-      l.classList.toggle('on', on);
-      if (on) cur = l;
+    {
+      const r2i = i2.getBoundingClientRect();
+      const q2 = clamp((innerHeight - r2i.top) / r2i.height);
+      for (const [g, up, second] of skyLayers) if (second) g.setAttribute('transform', `translate(0 ${(up * q2).toFixed(1)})`);
+      updateSay(sayWords[1], progress(i2));
     }
-    // quando compare la frase finale, le quattro tornano tutte normali
-    for (const l of lines2) l.classList.toggle('current', l === cur && p2 < .62);
-    counterEl.classList.toggle('on', p2 >= .08);
-    finalEl.classList.toggle('on', p2 >= .62);
-    const zero = p2 >= .58;
-    counterEl.classList.toggle('zero', zero);
-    // al centro sotto la mappa: lo sposto di metà dello spazio libero (ricalcolato mentre lo 0 cresce)
-    const free = cityEl.clientWidth - counterEl.offsetWidth;
-    counterEl.style.transform = zero ? `translateX(${(-free / 2).toFixed(1)}px)` : 'none';
+
+    // 2 · la strada: quattro passaggi a vuoto, poi il posto giusto
+    updateStreet(p2);
     // il buio arriva mentre la scena del giro scorre via e sale quella della notte
-    const dusk = ease(clamp((innerHeight * 1.15 - s3.getBoundingClientRect().top) / (innerHeight * 1.15)));
+    const dusk = ease(clamp((innerHeight * 1.15 - i2.getBoundingClientRect().top) / (innerHeight * 1.15)));
     root.setProperty('--dusk', dusk.toFixed(4));
 
     // 3 · una parola alla volta
@@ -625,8 +826,9 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     words.forEach((w, i) => w.classList.toggle('on', i < lit));
 
     // Colore della barra in alto secondo la scena
-    const r3 = s3.getBoundingClientRect(), r2 = s2.getBoundingClientRect(), r4 = s4.getBoundingClientRect();
-    const now = (r3.top <= 40 && r3.bottom > 40) || (r2.top <= 40 && r2.bottom > 40 && dusk > .5) ? 'night' : (r4.top <= 40 && r4.bottom > 40 && dawn < .5) ? 'mint2' : (r2.top <= 40 && r2.bottom > 40) || (p1 > .7 && r2.top > 40) ? 'mint' : 'day';
+    const r3 = s3.getBoundingClientRect(), r2 = s2.getBoundingClientRect(), r4 = s4.getBoundingClientRect(), ri1 = i1.getBoundingClientRect(), ri2 = i2.getBoundingClientRect();
+    const inI1 = ri1.top <= 40 && ri1.bottom > 40, inI2 = ri2.top <= 40 && ri2.bottom > 40;
+    const now = inI2 && dusk > .5 ? 'night' : inI1 ? 'mint' : (r3.top <= 40 && r3.bottom > 40) || (r2.top <= 40 && r2.bottom > 40 && dusk > .5) ? 'night' : (r4.top <= 40 && r4.bottom > 40 && dawn < .5) ? 'mint2' : (r2.top <= 40 && r2.bottom > 40) || (p1 > .7 && r2.top > 40) ? 'mint' : 'day';
     if (now !== scene) { scene = now; document.body.dataset.scene = now; }
 
     requestAnimationFrame(frame);
@@ -634,10 +836,11 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
 
   if (reduce) {
     // Movimento ridotto: tutto visibile, niente animazioni legate allo scorrimento
-    lines2.forEach((l) => l.classList.add('on'));
     hints.forEach((h) => { h.style.position = 'static'; h.classList.add('on'); });
     $('.hints').style.display = 'grid'; $('.hints').style.gap = '60px';
-    s2.style.height = s3.style.height = s4.style.height = s1.style.height = 'auto';
+    s2.style.height = s3.style.height = s4.style.height = s1.style.height = i1.style.height = i2.style.height = 'auto';
+    sayWords.flat().forEach((w) => w.classList.add('on'));
+    updateSky(.5);
     $$('.stage').forEach((st) => { st.style.position = 'relative'; st.style.height = 'auto'; st.style.minHeight = '100vh'; st.style.paddingBlock = '80px'; });
     words.forEach((w) => w.classList.add('on'));
     document.documentElement.style.setProperty('--dawn', 1);
@@ -645,8 +848,7 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     document.documentElement.style.setProperty('--zoom', 1);
     s3.querySelector('.stage').style.background = 'var(--notte)';
     document.documentElement.style.setProperty('--mark', 1);
-    dest.setAttribute('opacity', '1'); direct.setAttribute('stroke-dasharray', `${D} 9999`); laps.textContent = '0'; counterEl.classList.add('on'); finalEl.classList.add('on');
-    car.setAttribute('transform', 'translate(345 145)');
+    updateStreet(1);
   } else {
     sizeStars(); addEventListener('resize', sizeStars);
     requestAnimationFrame(frame);
