@@ -103,11 +103,11 @@ body[data-scene="dusk"] .top { color: var(--crema); }
 .mark-hi { background: linear-gradient(transparent 58%, rgba(242,193,78,.75) 58%, rgba(242,193,78,.75) 92%, transparent 92%); padding: 0 .08em; }
 .loop-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 4vw, 64px); width: min(1180px, 100%); padding-top: 56px; }
 .lines { display: grid; gap: 14px; }
-.line { font-family: var(--display); font-weight: 700; font-size: clamp(26px, min(3.6vw, 5.4vh), 46px); line-height: 1.08; opacity: .18; transform: translateY(10px); transition: opacity .5s, transform .5s, font-size .45s ease, color .45s; }
+.line { font-family: var(--display); font-weight: 700; font-size: clamp(22px, min(3vw, 4.6vh), 38px); line-height: 1.08; opacity: .18; transform: translateY(10px); text-shadow: 0 0 0 transparent; transition: opacity .5s, transform .5s, font-size .45s ease, color .45s, text-shadow .6s ease; }
 .line.on { opacity: 1; transform: none; }
 /* la frase del momento è più grande; l'ultima resta grande e diventa oro */
-.line.current { font-size: clamp(32px, min(4.6vw, 6.8vh), 60px); }
-.line.final.current { color: #D9A021; }
+.line.current { font-size: clamp(32px, min(4.6vw, 6.8vh), 60px); text-shadow: 0 8px 22px rgba(31,74,58,.16), 0 0 26px rgba(255,255,255,.7); }
+.line.final.current { color: #D9A021; text-shadow: 0 8px 22px rgba(31,74,58,.12), 0 0 28px rgba(242,193,78,.45); }
 .map-col { display: grid; gap: 14px; min-width: 0; }
 .map-col .counter { justify-self: end; opacity: 0; transition: opacity .5s; }
 .map-col .counter.on { opacity: 1; }
@@ -191,7 +191,8 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
   .loop-wrap { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .city { max-height: 42vh; }
   .cards { grid-template-columns: minmax(0, 1fr); }
-  .line { font-size: clamp(26px, 7.4vw, 40px); }
+  .line { font-size: clamp(21px, 6vw, 32px); }
+  .line.current { font-size: clamp(27px, 7.8vw, 40px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .logo .arc, .logo .pin, .logo .car, .word, .word span, .motto, .cue span { animation: none !important; opacity: 1 !important; transform: none !important; stroke-dashoffset: 0 !important; }
@@ -241,7 +242,7 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
         <div class="lines">
           <p class="line" data-at="0.03">Hai presente quella sensazione?</p>
           <p class="line" data-at="0.15">Quante volte dovrò girare</p>
-          <p class="line" data-at="0.27">Sperando di trovarne uno libero?</p>
+          <p class="line" data-at="0.27">Sperando di trovarne<br>uno libero?</p>
           <p class="line final" data-at="0.62">E se lo trovassimo noi per te?</p>
         </div>
         <div class="map-col">
