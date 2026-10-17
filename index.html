@@ -101,14 +101,18 @@ body[data-scene="dusk"] .top { color: var(--crema); }
 .backdrop .stars2 { position: absolute; inset: 0; opacity: var(--dusk, 0); background-image: radial-gradient(1.2px 1.2px at 12% 18%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 72% 12%, #FAF7F0 50%, transparent 51%), radial-gradient(1.4px 1.4px at 40% 70%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 86% 58%, #FAF7F0 50%, transparent 51%), radial-gradient(1.2px 1.2px at 24% 86%, #FAF7F0 50%, transparent 51%), radial-gradient(1px 1px at 58% 36%, #FAF7F0 50%, transparent 51%); }
 #s2 .stage { background: transparent; color: color-mix(in srgb, var(--crema) calc(var(--dusk, 0) * 100%), var(--menta-scuro)); }
 .mark-hi { background: linear-gradient(transparent 58%, rgba(242,193,78,.75) 58%, rgba(242,193,78,.75) 92%, transparent 92%); padding: 0 .08em; }
-.loop-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 4vw, 64px); width: min(1180px, 100%); padding-top: 56px; }
-.lines { display: grid; gap: 14px; }
+/* quattro frasi centrate rispetto alla mappa; sotto, la frase finale alla stessa altezza del contatore */
+.loop-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "lines map" "final counter"; align-items: center; column-gap: clamp(20px, 4vw, 64px); row-gap: 16px; width: min(1180px, 100%); padding-top: 56px; }
+.lines { grid-area: lines; display: grid; gap: 14px; align-self: center; }
+.final { grid-area: final; font-family: var(--display); font-weight: 700; font-size: clamp(32px, min(4.6vw, 6.8vh), 60px); line-height: 1.05; color: inherit; opacity: 0; transform: translateY(14px); text-shadow: 0 10px 16px rgba(31,74,58,.2); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
+.final.on { opacity: 1; transform: none; }
 .line { font-family: var(--display); font-weight: 700; font-size: clamp(22px, min(3vw, 4.6vh), 38px); line-height: 1.08; opacity: .18; transform: translateY(10px); text-shadow: 0 0 0 transparent; transition: opacity .5s, transform .5s, font-size .45s ease, color .45s, text-shadow .6s ease; }
 .line.on { opacity: 1; transform: none; }
 /* la frase del momento è più grande; l'ultima resta grande e diventa oro */
 .line.current { font-size: clamp(32px, min(4.6vw, 6.8vh), 60px); text-shadow: 0 10px 16px rgba(31,74,58,.2); }
-.line.final.current { color: #D9A021; text-shadow: 0 10px 16px rgba(92,67,10,.22); }
-.map-col { display: grid; gap: 14px; min-width: 0; }
+.map-col { display: contents; }
+.map-col .city { grid-area: map; }
+.map-col .counter { grid-area: counter; }
 .map-col .counter { justify-self: end; opacity: 0; transition: opacity .5s, transform .8s cubic-bezier(.2,.8,.2,1); }
 .map-col .counter b { transition: font-size .8s cubic-bezier(.2,.8,.2,1), color .8s, text-shadow .8s; }
 /* tornato a zero: scivola al centro, lo 0 cresce e diventa oro */
@@ -191,7 +195,8 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
 .btn:disabled { opacity: .6; cursor: default; }
 
 @media (max-width: 760px) {
-  .loop-wrap { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .loop-wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "lines" "map" "counter" "final"; row-gap: 10px; }
+  .final { font-size: clamp(27px, 7.8vw, 40px); }
   .city { max-height: 42vh; }
   .cards { grid-template-columns: minmax(0, 1fr); }
   .line { font-size: clamp(21px, 6vw, 32px); }
@@ -247,8 +252,8 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
           <p class="line" data-at="0.15">Quante volte dovrò girare</p>
           <p class="line" data-at="0.28">Sperando di trovarne</p>
           <p class="line" data-at="0.41">uno libero?</p>
-          <p class="line final" data-at="0.62">E se lo trovassimo noi per te?</p>
         </div>
+        <p class="final" id="finalLine">E se lo trovassimo noi per te?</p>
         <div class="map-col">
         <svg class="city" id="city" viewBox="0 0 520 420" aria-hidden="true" shape-rendering="geometricPrecision">
           <defs>
@@ -517,7 +522,7 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
 
   // Scena 2: geometria del giro
   const loop = $('#loop'), trail = $('#trail'), direct = $('#direct'), car = $('#car'), dest = $('#dest'), laps = $('#laps');
-  const lapsWord = $('#lapsWord'), counterEl = $('#counter');
+  const lapsWord = $('#lapsWord'), counterEl = $('#counter'), finalEl = $('#finalLine'), cityEl = $('#city');
   const L = loop.getTotalLength(), D = direct.getTotalLength();
   const lines2 = $$('#s2 .line');
 
@@ -594,12 +599,14 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
       l.classList.toggle('on', on);
       if (on) cur = l;
     }
-    for (const l of lines2) l.classList.toggle('current', l === cur);
+    // quando compare la frase finale, le quattro tornano tutte normali
+    for (const l of lines2) l.classList.toggle('current', l === cur && p2 < .62);
     counterEl.classList.toggle('on', p2 >= .08);
+    finalEl.classList.toggle('on', p2 >= .62);
     const zero = p2 >= .58;
     counterEl.classList.toggle('zero', zero);
     // al centro sotto la mappa: lo sposto di metà dello spazio libero (ricalcolato mentre lo 0 cresce)
-    const free = counterEl.parentElement.clientWidth - counterEl.offsetWidth;
+    const free = cityEl.clientWidth - counterEl.offsetWidth;
     counterEl.style.transform = zero ? `translateX(${(-free / 2).toFixed(1)}px)` : 'none';
     // il buio arriva mentre la scena del giro scorre via e sale quella della notte
     const dusk = ease(clamp((innerHeight * 1.15 - s3.getBoundingClientRect().top) / (innerHeight * 1.15)));
@@ -638,7 +645,7 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     document.documentElement.style.setProperty('--zoom', 1);
     s3.querySelector('.stage').style.background = 'var(--notte)';
     document.documentElement.style.setProperty('--mark', 1);
-    dest.setAttribute('opacity', '1'); direct.setAttribute('stroke-dasharray', `${D} 9999`); laps.textContent = '0'; counterEl.classList.add('on');
+    dest.setAttribute('opacity', '1'); direct.setAttribute('stroke-dasharray', `${D} 9999`); laps.textContent = '0'; counterEl.classList.add('on'); finalEl.classList.add('on');
     car.setAttribute('transform', 'translate(345 145)');
   } else {
     sizeStars(); addEventListener('resize', sizeStars);
