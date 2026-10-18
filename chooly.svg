@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 120 120">
-
-<!-- C spessa, verde scuro -->
-<path d="M92 34 A40 40 0 1 0 92 86" fill="none" stroke="#1F4A3A" stroke-width="14" stroke-linecap="round"/>
-<!-- le due "o" di chOOly: menta e oro, che si toccano -->
-<circle cx="56" cy="60" r="13" fill="#A6DCC3"/>
-<circle cx="80" cy="60" r="13" fill="#F2C14E"/>
-</svg>

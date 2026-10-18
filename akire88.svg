@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Akire88: quattro anelli (due "8" affiancati) e un punto al centro -->
+  <g fill="none" stroke-width="8">
+    <circle cx="36" cy="36" r="19" stroke="#14B8A6"/>
+    <circle cx="84" cy="36" r="19" stroke="#11293B"/>
+    <circle cx="36" cy="84" r="19" stroke="#11293B"/>
+    <circle cx="84" cy="84" r="19" stroke="#14B8A6"/>
+  </g>
+  <circle cx="60" cy="60" r="5.5" fill="#11293B"/>
+</svg>
