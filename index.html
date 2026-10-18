@@ -203,6 +203,14 @@ body[data-scene="dusk"] .top { color: var(--crema); }
 .join input { flex: 1 1 200px; min-width: 0; height: 54px; border-radius: 27px; border: 1.5px solid var(--bordo); background: var(--crema); padding: 0 20px; font: 600 17px var(--body); color: var(--testo); }
 .join input:focus, .field:focus { outline: 3px solid var(--menta); border-color: var(--menta-medio); }
 .ok { font-weight: 700; color: var(--menta-scuro); }
+.sheet.done > :not(.sent) { display: none; }
+.sent { display: grid; justify-items: center; gap: 14px; text-align: center; padding: 10px 0 4px; }
+.sent[hidden] { display: none; }
+.sent-ico { width: 72px; height: 72px; animation: pop .5s cubic-bezier(.2,1.4,.4,1); }
+.sent p { margin: 0; color: var(--grafite); }
+.sent .btn { margin-top: 6px; min-width: 160px; justify-self: center; }
+.sent h3:focus { outline: none; }
+@keyframes pop { from { transform: scale(.4); opacity: 0; } }
 .fine { font-size: 13px; color: var(--grafite); }
 footer { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; justify-content: space-between; padding-top: 26px; border-top: 1px solid var(--bordo); font-size: 14px; color: var(--grafite); }
 footer a { color: inherit; }
@@ -425,6 +433,13 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     <div class="row">
       <button class="btn ghost" type="button" data-close>Chiudi</button>
       <button class="btn" type="submit">Invia</button>
+    </div>
+    <!-- dopo l'invio: al posto del modulo, la conferma -->
+    <div class="sent" id="cSent" hidden>
+      <svg class="sent-ico" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="#A6DCC3"/><path d="M22 37 L32 47 L51 27" fill="none" stroke="#1F4A3A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3 id="cSentTitle" tabindex="-1">Messaggio inviato!</h3>
+      <p>Grazie per averci scritto. Ti abbiamo mandato una copia a <b id="cSentTo"></b> e ti risponderemo presto da assistenza@parkeely.it.</p>
+      <button class="btn" type="button" data-close>Chiudi</button>
     </div>
   </form>
 </div>
@@ -857,10 +872,16 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
   // Contattaci
   const modal = $('#contact'), form = $('#contactForm');
   let lastFocus = null;
-  const open = () => { lastFocus = document.activeElement; modal.classList.add('open'); setTimeout(() => $('#cEmail').focus(), 50); };
+  const open = () => {
+    lastFocus = document.activeElement;
+    // riaperto dopo un invio: di nuovo il modulo vuoto
+    form.classList.remove('done'); $('#cSent').hidden = true; $('#cNote').innerHTML = $('#cNote').dataset.base || $('#cNote').innerHTML;
+    modal.classList.add('open'); setTimeout(() => $('#cEmail').focus(), 50);
+  };
+  $('#cNote').dataset.base = $('#cNote').innerHTML;
   const close = () => { modal.classList.remove('open'); lastFocus && lastFocus.focus(); };
   $$('[data-open-contact]').forEach((b) => b.addEventListener('click', open));
-  $('[data-close]').addEventListener('click', close);
+  $$('[data-close]').forEach((b) => b.addEventListener('click', close));
   modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
   // Collegamento a Supabase: valori PUBBLICI (gli stessi dell'app). Il sito può solo chiamare
@@ -892,8 +913,10 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     btn.disabled = true; btn.textContent = 'Invio…';
     try {
       await call('site_contact', { p_email: email, p_message: msg, p_website: $('#cWeb').value });
-      note.innerHTML = '<span class="ok">Grazie! Il messaggio è arrivato: ti rispondiamo presto.</span>';
+      $('#cSentTo').textContent = email;
       form.reset();
+      form.classList.add('done'); $('#cSent').hidden = false;
+      setTimeout(() => $('#cSentTitle').focus(), 50);
     } catch (err) {
       note.textContent = problem(err);
     } finally {
@@ -909,7 +932,7 @@ textarea.field { min-height: 140px; resize: vertical; line-height: 1.45; }
     btn.disabled = true;
     try {
       await call('newsletter_join', { p_email: v, p_website: $('#joinWeb').value });
-      msg.innerHTML = '<span class="ok">Quasi fatto! Ti abbiamo mandato un’email: apri il link per confermare l’iscrizione.</span>';
+      msg.innerHTML = '<span class="ok">Fatto! Controlla la tua email: se è la prima volta che ti iscrivi, apri il link per confermare.</span>';
       e.target.reset();
     } catch (err) {
       msg.textContent = problem(err);
